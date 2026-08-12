@@ -1,4 +1,4 @@
-# CRUX — Concurrent Resource Unused eXtractor
+# CRUX — Concurrence Ressources Unused eXtractor
 
 CRUX is a static analysis tool designed to detect unnecessary synchronization locks (mutexes, spinlocks, rwlocks) in C/C++ programs by operating on LLVM IR (`.ll` / `.bc`).
 
