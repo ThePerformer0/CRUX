@@ -134,7 +134,8 @@ class LocksetAnalyzer:
 
             # Propagate updated state to successors
             for succ_name in block.successors:
-                worklist.put((succ_name, current_state))
+                if succ_name in cfg.blocks:
+                    worklist.put((succ_name, current_state))
 
         return instruction_states
 

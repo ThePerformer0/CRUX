@@ -167,10 +167,13 @@ def _compute_cfg_edges(cfg: CFG) -> None:
                     block.successors.append(target)
             continue
 
+    # Filter successors to only include valid blocks defined in cfg.blocks
+    for block in cfg.blocks.values():
+        block.successors = [s for s in block.successors if s in cfg.blocks]
+
     # Compute predecessors from successors
     for block_name, block in cfg.blocks.items():
         for succ_name in block.successors:
-            if succ_name in cfg.blocks:
-                succ_block = cfg.blocks[succ_name]
-                if block_name not in succ_block.predecessors:
-                    succ_block.predecessors.append(block_name)
+            succ_block = cfg.blocks[succ_name]
+            if block_name not in succ_block.predecessors:
+                succ_block.predecessors.append(block_name)
