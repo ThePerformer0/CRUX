@@ -138,10 +138,15 @@ def build_call_graph(llvm_ir_text: str) -> CallGraph:
             current_func = None
 
     # Step 3: Class Hierarchy Analysis (CHA) for indirect calls
-    # Match indirect calls conservatively against defined candidate functions
+    # Limit CHA fallback to max 50 candidates per indirect call site to avoid O(N*M) graph explosion on large C++ codebases
+    max_cha_candidates = 50
     for caller, line in indirect_call_sites:
+        count = 0
         for candidate in cg.defined_functions:
-            if not candidate.startswith("llvm."):
+            if not candidate.startswith("llvm.") and candidate != caller:
                 cg.add_edge(caller, candidate)
+                count += 1
+                if count >= max_cha_candidates:
+                    break
 
     return cg
