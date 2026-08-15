@@ -21,10 +21,18 @@ class UnionFind:
         if i not in self.parent:
             self.parent[i] = i
             return i
-        if self.parent[i] == i:
-            return i
-        self.parent[i] = self.find(self.parent[i])
-        return self.parent[i]
+
+        curr = i
+        path = []
+        while self.parent.get(curr, curr) != curr:
+            path.append(curr)
+            curr = self.parent[curr]
+            if curr in path:
+                break
+
+        for node in path:
+            self.parent[node] = curr
+        return curr
 
     def union(self, i: str, j: str) -> str:
         root_i = self.find(i)
@@ -116,23 +124,31 @@ class AliasResolver:
                     stored_val = self.points_to[ptr_reg]
                     self.uf.union(inst.dest, stored_val)
 
-    def get_canonical_id(self, reg: str) -> str:
+    def get_canonical_id(self, reg: str, visited: Optional[Set[str]] = None) -> str:
         """Returns the canonical identifier for a register or variable string.
 
         Args:
             reg: LLVM IR register name (e.g. '%11', '%p', '@global_var').
+            visited: Set of previously visited registers to prevent GEP cycles.
 
         Returns:
             Canonical string identifier.
         """
+        if visited is None:
+            visited = set()
+
         clean_reg = reg.strip()
         if clean_reg.endswith(","):
             clean_reg = clean_reg[:-1].strip()
 
+        if clean_reg in visited:
+            return clean_reg
+        visited.add(clean_reg)
+
         # Check if register is a GEP derived pointer
         if clean_reg in self.gep_map:
             base_reg, field_idx = self.gep_map[clean_reg]
-            base_canon = self.get_canonical_id(base_reg)
+            base_canon = self.get_canonical_id(base_reg, visited)
             return f"{base_canon}.{field_idx}"
 
         # Resolve through Union-Find equivalence class
@@ -141,7 +157,7 @@ class AliasResolver:
         # Check if root itself is a GEP
         if root != clean_reg and root in self.gep_map:
             base_reg, field_idx = self.gep_map[root]
-            base_canon = self.get_canonical_id(base_reg)
+            base_canon = self.get_canonical_id(base_reg, visited)
             return f"{base_canon}.{field_idx}"
 
         return root
