@@ -20,6 +20,9 @@ class CallGraph:
     defined_functions: Set[str] = field(default_factory=set)
     function_signatures: Dict[str, str] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        self._transitive_cache: Dict[str, Set[str]] = {}
+
     def add_edge(self, caller: str, callee: str) -> None:
         """Adds a directed call edge caller -> callee, ignoring LLVM intrinsics."""
         if callee.startswith("llvm."):
@@ -35,6 +38,7 @@ class CallGraph:
 
         pair = (caller, callee)
         self.call_counts[pair] = self.call_counts.get(pair, 0) + 1
+        self._transitive_cache.clear()
 
     def get_callees(self, func: str) -> List[str]:
         """Returns direct callees for a given function."""
@@ -46,6 +50,9 @@ class CallGraph:
 
     def get_transitive_callees(self, func: str, visited: Optional[Set[str]] = None) -> Set[str]:
         """Returns all functions transitively called by func, handling cycles/recursion iteratively."""
+        if visited is None and func in self._transitive_cache:
+            return self._transitive_cache[func]
+
         visited_nodes = set()
         if visited is not None:
             visited_nodes.update(visited)
@@ -63,6 +70,9 @@ class CallGraph:
                 result.add(callee)
                 if callee not in visited_nodes:
                     stack.append(callee)
+
+        if visited is None:
+            self._transitive_cache[func] = result
 
         return result
 

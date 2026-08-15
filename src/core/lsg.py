@@ -53,27 +53,31 @@ class LockSiteGraph:
         self._build_hb_edges()
 
     def _build_share_edges(self) -> None:
-        """Constructs SHARE edges between sites accessing the same shared variable with at least one write."""
+        """Constructs SHARE edges between sites accessing the same shared variable with at least one write using an inverted index."""
         sites_list = list(self.sites_by_id.values())
-        num_sites = len(sites_list)
+        var_to_sites: Dict[str, Set[str]] = {}
 
-        for i in range(num_sites):
-            for j in range(i + 1, num_sites):
-                s1, s2 = sites_list[i], sites_list[j]
+        for site in sites_list:
+            all_vars = site.reads | site.writes | site.transitive_reads | site.transitive_writes
+            for v in all_vars:
+                if v not in var_to_sites:
+                    var_to_sites[v] = set()
+                var_to_sites[v].add(site.site_id)
 
-                vars_s1 = s1.reads | s1.writes | s1.transitive_reads | s1.transitive_writes
-                vars_s2 = s2.reads | s2.writes | s2.transitive_reads | s2.transitive_writes
-
-                writes_s1 = s1.writes | s1.transitive_writes
-                writes_s2 = s2.writes | s2.transitive_writes
-
-                common_vars = vars_s1 & vars_s2
-                if common_vars:
-                    # Conflict exists if at least one site writes to the common variable
-                    has_conflict = bool((writes_s1 & common_vars) or (writes_s2 & common_vars))
-                    if has_conflict:
-                        self.graph.add_edge(s1.site_id, s2.site_id, key=EdgeKind.SHARE.value, kind=EdgeKind.SHARE)
-                        self.graph.add_edge(s2.site_id, s1.site_id, key=EdgeKind.SHARE.value, kind=EdgeKind.SHARE)
+        added_edges = set()
+        for site in sites_list:
+            writes = site.writes | site.transitive_writes
+            if not writes:
+                continue
+            for w_var in writes:
+                for other_site_id in var_to_sites.get(w_var, ()):
+                    if other_site_id != site.site_id:
+                        edge_key = (site.site_id, other_site_id)
+                        if edge_key not in added_edges:
+                            self.graph.add_edge(site.site_id, other_site_id, key=EdgeKind.SHARE.value, kind=EdgeKind.SHARE)
+                            self.graph.add_edge(other_site_id, site.site_id, key=EdgeKind.SHARE.value, kind=EdgeKind.SHARE)
+                            added_edges.add(edge_key)
+                            added_edges.add((other_site_id, site.site_id))
 
     def _build_nest_edges(self) -> None:
         """Constructs NEST edges from parent lock site to nested child lock site."""
