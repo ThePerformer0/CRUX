@@ -11,6 +11,15 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Set, Tuple, Optional
 
 
+UTILITY_FUNCTIONS_TO_SKIP = {
+    "palloc", "palloc0", "pfree", "MemoryContextAlloc", "MemoryContextAllocZero",
+    "elog", "ereport", "errfinish", "errmsg", "errcode", "errdetail",
+    "malloc", "free", "realloc", "calloc", "memset", "memcpy", "memmove",
+    "strlen", "strcmp", "strncmp", "strcpy", "strncpy", "sprintf", "snprintf",
+    "printf", "fprintf", "vsnprintf", "assert", "__assert_fail", "exit", "abort"
+}
+
+
 @dataclass
 class CallGraph:
     """Represents the interprocedural Call Graph of an LLVM IR module."""
@@ -24,8 +33,8 @@ class CallGraph:
         self._transitive_cache: Dict[str, Set[str]] = {}
 
     def add_edge(self, caller: str, callee: str) -> None:
-        """Adds a directed call edge caller -> callee, ignoring LLVM intrinsics."""
-        if callee.startswith("llvm."):
+        """Adds a directed call edge caller -> callee, ignoring LLVM intrinsics and utility functions."""
+        if callee.startswith("llvm.") or callee in UTILITY_FUNCTIONS_TO_SKIP:
             return  # Skip LLVM intrinsics
 
         if caller not in self.calls:

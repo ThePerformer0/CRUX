@@ -28,6 +28,7 @@ class SiteExtractor:
         self.call_graph = call_graph
         self.lockset_analyzer = lockset_analyzer
         self.function_effects: Dict[str, Tuple[Set[str], Set[str]]] = {}
+        self._transitive_effects_cache: Dict[str, Tuple[Set[str], Set[str]]] = {}
 
     def extract_sites(self, cfgs: Dict[str, CFG]) -> List[LockSite]:
         """Extracts and characterizes all LockSite instances across the given CFGs.
@@ -176,13 +177,21 @@ class SiteExtractor:
                     worklist.append((succ, 0))
 
     def _compute_transitive_effects(self, site: LockSite) -> None:
-        """Aggregates transitive memory reads and writes for callees in the critical section."""
+        """Aggregates transitive memory reads and writes for callees in the critical section using memoization."""
         for callee in site.calls:
-            transitive_callees = self.call_graph.get_transitive_callees(callee)
-            all_callees = {callee} | transitive_callees
+            if callee not in self._transitive_effects_cache:
+                transitive_callees = self.call_graph.get_transitive_callees(callee)
+                all_callees = {callee} | transitive_callees
+                reads: Set[str] = set()
+                writes: Set[str] = set()
 
-            for c in all_callees:
-                if c in self.function_effects:
-                    reads, writes = self.function_effects[c]
-                    site.transitive_reads |= reads
-                    site.transitive_writes |= writes
+                for c in all_callees:
+                    if c in self.function_effects:
+                        r, w = self.function_effects[c]
+                        reads |= r
+                        writes |= w
+                self._transitive_effects_cache[callee] = (reads, writes)
+
+            reads, writes = self._transitive_effects_cache[callee]
+            site.transitive_reads |= reads
+            site.transitive_writes |= writes
