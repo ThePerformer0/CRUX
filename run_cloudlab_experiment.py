@@ -1,11 +1,12 @@
 """CloudLab Automated 15-Run Benchmark Script for Memcached Ablation Experiments.
 
-To be executed directly on the CloudLab node by the user.
+Specifically tests 1 SINGLE LOCK SITE: s58 (items.c: lru_total_bumps_dropped).
+Starts Memcached with -m 64 (64 MB RAM limit) to force continuous LRU eviction.
 
 Automates:
-1. 15 independent baseline runs of Memcached 1.6.22
-2. Prompts user to apply the patch (or applies patch on s58 automatically)
-3. 15 independent ablation runs of patched Memcached 1.6.22
+1. 15 independent baseline runs of Memcached 1.6.22 (-m 64)
+2. Applies CRUX patch ONLY on site s58
+3. 15 independent ablation runs of patched Memcached 1.6.22 (-m 64)
 4. Exports raw results to ~/results/memcached_15_runs.csv for SCP download
 """
 
@@ -13,19 +14,18 @@ import os
 import csv
 import time
 import subprocess
-import numpy as np
 
 
 def run_benchmark_iteration(run_id: int, run_type: str, memcached_dir: str, crux_dir: str) -> dict:
-    """Launches Memcached, runs benchmark.py, and returns metrics dict."""
-    print(f"  [{run_type.upper()} Run {run_id:02d}/15] Starting Memcached server...", end="", flush=True)
+    """Launches Memcached with -m 64 (small RAM limit for LRU eviction storm), runs benchmark.py."""
+    print(f"  [{run_type.upper()} Run {run_id:02d}/15] Starting Memcached (-m 64)...", end="", flush=True)
 
     # Kill any existing memcached instance
     subprocess.run("killall -9 memcached 2>/dev/null", shell=True)
     time.sleep(1)
 
-    # Start Memcached server in background
-    mc_cmd = f"cd {memcached_dir} && ./memcached -t 4 -m 1024 -p 11211 &"
+    # Start Memcached server with 64MB RAM limit to force active LRU evictions
+    mc_cmd = f"cd {memcached_dir} && ./memcached -t 4 -m 64 -p 11211 &"
     subprocess.run(mc_cmd, shell=True)
     time.sleep(2)
 
@@ -59,7 +59,7 @@ def run_benchmark_iteration(run_id: int, run_type: str, memcached_dir: str, crux
 
 
 def apply_s58_patch(memcached_dir: str):
-    """Applies CRUX ablation patch on site s58 (items.c: lru_total_bumps_dropped)."""
+    """Applies CRUX ablation patch on 1 SINGLE LOCK SITE: s58 (items.c: lru_total_bumps_dropped)."""
     items_path = os.path.join(memcached_dir, "items.c")
     with open(items_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -82,7 +82,7 @@ def apply_s58_patch(memcached_dir: str):
     lru_bump_buf *b;
     pthread_mutex_lock(&bump_buf_lock);
     for (b = bump_buf_head; b != NULL; b=b->next) {
-        /* CRUX ABLATION s58: Redundant b->mutex removed */
+        /* CRUX ABLATION s58 ONLY: Redundant b->mutex removed */
         total += b->dropped;
     }
     pthread_mutex_unlock(&bump_buf_lock);
@@ -92,7 +92,7 @@ def apply_s58_patch(memcached_dir: str):
     if target in content:
         with open(items_path, "w", encoding="utf-8") as f:
             f.write(content.replace(target, replacement))
-        print("\n[PATCH SUCCESS] Patch s58 applied to items.c!")
+        print("\n[PATCH SUCCESS] Patch s58 (1 SINGLE LOCK SITE) applied to items.c!")
     else:
         print("\n[PATCH NOTICE] Code target already modified or not matched.")
 
@@ -113,21 +113,21 @@ def main():
     all_metrics = []
 
     print("======================================================================")
-    print("      CLOUDLAB MEMCACHED 15-RUN AUTOMATED ABLATION EXPERIMENT")
+    print("      CLOUDLAB MEMCACHED 15-RUN EVICTION EXPERIMENT (SITE s58 ONLY)")
     print("======================================================================")
 
-    # 1. BASELINE RUNS (Unpatched)
-    print("\n--- PHASE 1: Running 15 BASELINE Iterations (Unpatched Memcached) ---")
+    # 1. BASELINE RUNS (Unpatched, -m 64)
+    print("\n--- PHASE 1: Running 15 BASELINE Iterations (Unpatched, -m 64 MB) ---")
     for i in range(1, 16):
         m = run_benchmark_iteration(i, "baseline", memcached_dir, crux_dir)
         all_metrics.append(m)
 
-    # 2. APPLY PATCH & RECOMPILE
-    print("\n--- PHASE 2: Applying Patch on Site s58 (items.c: lru_total_bumps_dropped) ---")
+    # 2. APPLY PATCH ON 1 SINGLE LOCK SITE s58
+    print("\n--- PHASE 2: Applying Patch ONLY on Site s58 (items.c: lru_total_bumps_dropped) ---")
     apply_s58_patch(memcached_dir)
 
-    # 3. ABLATION RUNS (Patched)
-    print("\n--- PHASE 3: Running 15 ABLATION Iterations (Patched Memcached s58) ---")
+    # 3. ABLATION RUNS (Patched s58, -m 64)
+    print("\n--- PHASE 3: Running 15 ABLATION Iterations (Patched Site s58 ONLY, -m 64 MB) ---")
     for i in range(1, 16):
         m = run_benchmark_iteration(i, "ablation", memcached_dir, crux_dir)
         all_metrics.append(m)

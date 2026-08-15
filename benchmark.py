@@ -1,6 +1,7 @@
-"""Self-contained multi-threaded Memcached benchmark script for CRUX ablation studies.
+"""High-Eviction Multi-Threaded Memcached Benchmark Script for CRUX Ablation Experiments.
 
-Measures Throughput (QPS / ops/sec) and Latency (avg, p50, p95, p99) under heavy concurrent load.
+Specifically designed to force intensive LRU eviction activity, calling
+lru_total_bumps_dropped() on every request to measure the isolated impact of site s58.
 """
 
 import time
@@ -10,26 +11,23 @@ import numpy as np
 from typing import List
 
 
-def memcached_worker(host: str, port: int, num_ops: int, thread_id: int, latencies: List[float]) -> None:
-    """Worker thread performing GET and SET operations over raw TCP socket."""
+def memcached_eviction_worker(host: str, port: int, num_ops: int, thread_id: int, latencies: List[float]) -> None:
+    """Worker thread performing continuous SET operations with large payloads to force LRU evictions."""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((host, port))
 
-        key = f"crux_key_{thread_id}".encode("utf-8")
-        val = b"x" * 128
-        set_cmd = f"set crux_key_{thread_id} 0 0 128\r\n".encode("utf-8") + val + b"\r\n"
-        get_cmd = f"get crux_key_{thread_id}\r\n".encode("utf-8")
+        payload = b"X" * 32768  # 32 KB payload per item to fill 64 MB RAM quickly
 
         for i in range(num_ops):
+            key = f"crux_evict_t{thread_id}_k{i}".encode("utf-8")
+            set_cmd = f"set crux_evict_t{thread_id}_k{i} 0 0 32768\r\n".encode("utf-8") + payload + b"\r\n"
+
             t0 = time.perf_counter()
-            if i % 2 == 0:
-                s.sendall(set_cmd)
-                res = s.recv(128)
-            else:
-                s.sendall(get_cmd)
-                res = s.recv(256)
+            s.sendall(set_cmd)
+            res = s.recv(128)
             t1 = time.perf_counter()
+
             latencies.append((t1 - t0) * 1000.0)  # ms
 
         s.close()
@@ -37,8 +35,8 @@ def memcached_worker(host: str, port: int, num_ops: int, thread_id: int, latenci
         print(f"[Worker Error] Thread {thread_id}: {e}")
 
 
-def run_benchmark(host: str = "127.0.0.1", port: int = 11211, num_threads: int = 16, ops_per_thread: int = 5000) -> dict:
-    print(f"[CRUX BENCHMARK] Running Memcached load test: {num_threads} threads, {ops_per_thread} ops/thread...")
+def run_benchmark(host: str = "127.0.0.1", port: int = 11211, num_threads: int = 16, ops_per_thread: int = 2500) -> dict:
+    print(f"[CRUX EVICTION BENCHMARK] Running Memcached LRU Eviction load test: {num_threads} threads, {ops_per_thread} ops/thread (32KB payloads)...")
 
     threads = []
     thread_latencies: List[List[float]] = [[] for _ in range(num_threads)]
@@ -46,7 +44,7 @@ def run_benchmark(host: str = "127.0.0.1", port: int = 11211, num_threads: int =
     start_time = time.perf_counter()
 
     for i in range(num_threads):
-        t = threading.Thread(target=memcached_worker, args=(host, port, ops_per_thread, i, thread_latencies[i]))
+        t = threading.Thread(target=memcached_eviction_worker, args=(host, port, ops_per_thread, i, thread_latencies[i]))
         threads.append(t)
         t.start()
 
