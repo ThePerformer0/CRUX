@@ -45,19 +45,24 @@ class CallGraph:
         return self.callers.get(func, [])
 
     def get_transitive_callees(self, func: str, visited: Optional[Set[str]] = None) -> Set[str]:
-        """Returns all functions transitively called by func, handling cycles/recursion."""
-        if visited is None:
-            visited = set()
+        """Returns all functions transitively called by func, handling cycles/recursion iteratively."""
+        visited_nodes = set()
+        if visited is not None:
+            visited_nodes.update(visited)
 
-        if func in visited:
-            return set()
+        result: Set[str] = set()
+        stack = [func]
 
-        visited.add(func)
-        result = set()
+        while stack:
+            curr = stack.pop()
+            if curr in visited_nodes:
+                continue
+            visited_nodes.add(curr)
 
-        for callee in self.get_callees(func):
-            result.add(callee)
-            result |= self.get_transitive_callees(callee, visited)
+            for callee in self.get_callees(curr):
+                result.add(callee)
+                if callee not in visited_nodes:
+                    stack.append(callee)
 
         return result
 
