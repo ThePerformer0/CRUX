@@ -5,6 +5,7 @@ Parses command line arguments, orchestrates the 10 analysis phases,
 and outputs the JSON analysis report.
 """
 
+import os
 import sys
 import time
 import json
