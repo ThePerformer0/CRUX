@@ -45,6 +45,30 @@ def test_alias_global_stores_and_loads():
     assert canon_load1 == canon_store
 
 
+def test_alias_gep_opaque_pointers_and_i64():
+    """Simulate PostgreSQL MainLWLockArray GEP index calculation in 64-bit LLVM IR."""
+    resolver = AliasResolver()
+    
+    # Load 1: acquire
+    inst_load1 = parse_instruction("%24 = load ptr, ptr @MainLWLockArray, align 8")
+    inst_gep1 = parse_instruction("%25 = getelementptr inbounds %struct.LWLockPadded, ptr %24, i64 12, i32 0")
+    
+    # Load 2: release
+    inst_load2 = parse_instruction("%27 = load ptr, ptr @MainLWLockArray, align 8")
+    inst_gep2 = parse_instruction("%28 = getelementptr inbounds %struct.LWLockPadded, ptr %27, i64 12, i32 0")
+    
+    resolver._process_instruction(inst_load1)
+    resolver._process_instruction(inst_gep1)
+    resolver._process_instruction(inst_load2)
+    resolver._process_instruction(inst_gep2)
+    
+    canon1 = resolver.get_canonical_id("%25")
+    canon2 = resolver.get_canonical_id("%28")
+    
+    assert canon1 == canon2
+    assert "12" in canon1
+
+
 def test_escaping_lock_wrapper_not_empty_cs():
     """LockBuffer pattern: lock is acquired and returned without unlock in same function."""
     lsg = LockSiteGraph()

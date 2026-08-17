@@ -83,21 +83,28 @@ class AliasResolver:
                 src_reg = src_match.group(1)
                 self.uf.union(inst.dest, src_reg)
 
-        # Rule 2: %dst = getelementptr %struct, %base, i32 0, i32 N
+        # Rule 2: %dst = getelementptr ...
         elif inst.opcode == "getelementptr" and inst.dest:
-            gep_match = GEP_PATTERN.search(raw)
-            if gep_match:
-                base_reg = gep_match.group(1)
-                field_idx = gep_match.group(2)
-                self.gep_map[inst.dest] = (base_reg, field_idx)
-            else:
-                # Fallback for generic GEP: find last integer index
-                indices = re.findall(r"i32\s+(\d+)", raw)
-                regs = re.findall(r"(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)", raw)
-                if len(regs) >= 2 and indices:
-                    base_reg = regs[1]  # First operand after struct type
-                    field_idx = indices[-1]
-                    self.gep_map[inst.dest] = (base_reg, field_idx)
+            gep_idx = raw.find("getelementptr")
+            gep_body = raw[gep_idx + len("getelementptr"):] if gep_idx != -1 else raw
+            parts = gep_body.split(",")
+            
+            if len(parts) >= 2:
+                # Base pointer is in parts[1]: e.g. "%struct.Pool* %p" or "ptr %p" or "ptr @arr"
+                base_regs = re.findall(r"(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)", parts[1])
+                # Indices are in remaining parts
+                indices_text = ",".join(parts[2:]) if len(parts) > 2 else parts[1]
+                indices = re.findall(r"(?:i8|i16|i32|i64)\s+(-?\d+)", indices_text)
+                
+                if base_regs:
+                    base_reg = base_regs[-1]
+                    if len(indices) == 2 and indices[0] == "0":
+                        offset = indices[1]
+                    elif indices:
+                        offset = ".".join(indices)
+                    else:
+                        offset = "0"
+                    self.gep_map[inst.dest] = (base_reg, offset)
 
         # Rule 3: %dst = phi [%p1, %bb1], [%p2, %bb2]
         elif inst.opcode == "phi" and inst.dest:
