@@ -1,0 +1,20 @@
+--- a/src/backend/access/transam/multixact.c
++++ b/src/backend/access/transam/multixact.c
+@@ -2046,7 +2046,7 @@ TrimMultiXact(void)
+ 	LWLockRelease(MultiXactGenLock);
+ 
+ 	/* Clean up offsets state */
+-	LWLockAcquire(MultiXactOffsetSLRULock, LW_EXCLUSIVE);
++	/* CRUX ABLATION s44: Redundant MultiXactOffsetSLRULock removed */
+ 
+ 	/*
+ 	 * (Re-)Initialize our idea of the latest page number for offsets.
+@@ -2077,7 +2077,7 @@ TrimMultiXact(void)
+ 		MultiXactOffsetCtl->shared->page_dirty[slotno] = true;
+ 	}
+ 
+-	LWLockRelease(MultiXactOffsetSLRULock);
++	/* CRUX ABLATION s44: Redundant MultiXactOffsetSLRULock removed */
+ 
+ 	/* And the same for members */
+ 	LWLockAcquire(MultiXactMemberSLRULock, LW_EXCLUSIVE);

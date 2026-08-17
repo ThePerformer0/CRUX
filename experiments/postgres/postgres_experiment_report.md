@@ -83,10 +83,3 @@ LWLockRelease(MultiXactOffsetSLRULock);  // line 2080
 3. **Verdict**: The acquisition of `MultiXactOffsetSLRULock` represents classical **defensive programming**. While safe and standard in PostgreSQL architecture for stylistic symmetry, it does not prevent any runtime data race in this execution context.
 
 ---
-
-## 4. Key Architectural Takeaways for ASPLOS
-
-1. **Scalability on Massive Real-World Codebases**:
-   CRUX successfully parsed and modeled the complete interprocedural CFG and Lockset graph of PostgreSQL backend (41.2 MB LLVM IR, 488 lock sites) in under 3 minutes with full Z3 SMT validation.
-2. **False Positive Resilience**:
-   With 64-bit GEP array indexing alias unification (`alias_resolver.py`) and escaping lock safety guards (`classifier.py`), CRUX achieved **99.8% precision** on a production DBMS codebase without emitting noisy false alarms on wrapper functions (`LockBuffer`) or global arrays (`MainLWLockArray`).
