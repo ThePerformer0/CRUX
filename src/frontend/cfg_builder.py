@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Set
 from src.frontend.parser import (
     LLVMInstruction,
     parse_instruction,
+    parse_debug_metadata,
     TERMINATOR_BR_UNCOND,
     TERMINATOR_BR_COND,
     TERMINATOR_SWITCH,
@@ -53,6 +54,7 @@ def build_cfgs(llvm_ir_text: str) -> Dict[str, CFG]:
     """
     cfgs: Dict[str, CFG] = {}
     lines = llvm_ir_text.splitlines()
+    debug_map = parse_debug_metadata(llvm_ir_text)
 
     i = 0
     num_lines = len(lines)
@@ -103,7 +105,7 @@ def build_cfgs(llvm_ir_text: str) -> Dict[str, CFG]:
                         accumulated.append(lines[i].strip())
                     curr_line = " ".join(accumulated)
 
-                inst = parse_instruction(curr_line, line_number=i + 1)
+                inst = parse_instruction(curr_line, line_number=i + 1, debug_map=debug_map)
                 current_instructions.append(inst)
                 i += 1
 

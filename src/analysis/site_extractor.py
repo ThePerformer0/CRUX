@@ -68,6 +68,7 @@ class SiteExtractor:
                             mutex_canonical_id=canon_mutex,
                             mutex_name=mutex_name,
                             function=func_name,
+                            source_file=inst.source_file,
                             lock_source_line=inst.line_number,
                             lockset_at_entry=entry_lockset,
                             path_conditions=path_conds,

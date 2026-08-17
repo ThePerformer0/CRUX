@@ -58,25 +58,12 @@ def generate_report(sites: List[LockSite], lsg: LockSiteGraph,
     for s in reported_useless:
         useless_list.append({
             "id": s.site_id,
-            "confidence_score": s.confidence_score,
             "mutex_name": s.mutex_name,
-            "mutex_canonical_id": s.mutex_canonical_id,
             "function": s.function,
             "source_file": s.source_file,
             "lock_source_line": s.lock_source_line,
             "unlock_source_lines": s.unlock_source_lines,
-            "reasons": s.reasons,
-            "num_direct_reads": len(s.reads),
-            "num_direct_writes": len(s.writes),
-            "num_transitive_reads": len(s.transitive_reads),
-            "num_transitive_writes": len(s.transitive_writes),
-            "sample_accesses": {
-                "reads": sorted(list(s.reads))[:5],
-                "writes": sorted(list(s.writes))[:5]
-            },
-            "share_edges_count": 1 if lsg.has_share_edge(s.site_id) else 0,
-            "smt_path_feasible": s.smt_confirmed,
-            "suggested_fix": s.suggested_fix,
+            "reasons": s.reasons
         })
 
     warnings: List[str] = []
