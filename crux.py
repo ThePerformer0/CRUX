@@ -88,6 +88,9 @@ def main() -> None:
     report = generate_report(sites, lsg, args.llvm_ir_file, elapsed_time, smt_enabled=args.smt, min_score=args.min_score)
 
     if args.output:
+        out_dir = os.path.dirname(args.output)
+        if out_dir:
+            os.makedirs(out_dir, exist_ok=True)
         with open(args.output, "w", encoding="utf-8") as f:
             json.dump(report, f, indent=2, ensure_ascii=False)
         if args.verbose:
