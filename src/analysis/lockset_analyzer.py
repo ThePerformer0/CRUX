@@ -3,15 +3,23 @@
 Performs BFS dataflow analysis on function CFGs to track held locksets at every instruction.
 Features conservative lockset intersection joins at CFG convergence points,
 handles `pthread_cond_wait` (net effect 0), and collects path conditions for SMT validation.
+
+Fixpoint convergence is computed on the lockset ONLY (finite lattice, guaranteed termination).
+Path conditions are collected per-path for SMT validation but never block convergence.
 """
 
 import re
-from queue import Queue
+from collections import deque
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, FrozenSet, Optional, Tuple
+from typing import Dict, List, Set, FrozenSet, Optional, Tuple, Deque
 from src.frontend.cfg_builder import CFG, BasicBlock
 from src.frontend.parser import LLVMInstruction, TERMINATOR_BR_COND
 from src.analysis.alias_resolver import AliasResolver
+
+# Maximum number of path conditions retained per site.
+# Beyond this threshold we remain conservative: the SMT validator receives
+# a subset of conditions but lockset correctness is not affected.
+MAX_PATH_CONDITIONS: int = 32
 
 LOCK_FUNCTIONS: Set[str] = {
     # POSIX
@@ -86,36 +94,54 @@ class LocksetAnalyzer:
     def analyze_cfg(self, cfg: CFG) -> Dict[str, List[LockState]]:
         """Performs BFS Lockset Analysis on a single CFG.
 
+        Fixpoint criterion: lockset only (finite lattice → guaranteed termination).
+        Path conditions are collected along paths and merged conservatively at join
+        points, but they do NOT participate in the fixpoint check — the lattice of
+        path-condition sets is infinite, so including them would prevent convergence
+        on functions containing loops or multiple back-edges.
+
         Args:
             cfg: CFG instance for a function.
 
         Returns:
             Dictionary mapping block_name -> List of LockState per instruction in that block.
         """
+        # Maps block_name -> stable LockState at block entry (None = not yet visited)
         block_entry_states: Dict[str, Optional[LockState]] = {b: None for b in cfg.blocks}
         instruction_states: Dict[str, List[LockState]] = {b: [] for b in cfg.blocks}
 
         if not cfg.blocks or cfg.entry_block not in cfg.blocks:
             return instruction_states
 
-        worklist: Queue[Tuple[str, LockState]] = Queue()
+        # Use a plain deque (not thread-safe Queue) — analysis is single-threaded.
+        # This removes all threading lock overhead from every put/get.
+        worklist: Deque[Tuple[str, LockState]] = deque()
         initial_state = LockState(lockset=frozenset(), path_conditions=())
-        worklist.put((cfg.entry_block, initial_state))
+        worklist.append((cfg.entry_block, initial_state))
 
-        while not worklist.empty():
-            block_name, incoming_state = worklist.get()
+        while worklist:
+            block_name, incoming_state = worklist.popleft()
 
-            # Join operation at CFG convergence points (Intersection of locksets)
             if block_entry_states[block_name] is not None:
                 prev_state = block_entry_states[block_name]
+
+                # --- Fixpoint on LOCKSET only (finite lattice) ---
                 joined_lockset = prev_state.lockset & incoming_state.lockset
-                # Combine unique path conditions
-                joined_conds = tuple(dict.fromkeys(prev_state.path_conditions + incoming_state.path_conditions))
+                if joined_lockset == prev_state.lockset:
+                    # Lockset has not changed: fixpoint reached for this block.
+                    # Path conditions may differ across visits but do not affect
+                    # lockset correctness, so we stop propagating.
+                    continue
+
+                # Lockset shrank: merge path conditions conservatively and re-propagate.
+                # We cap at MAX_PATH_CONDITIONS to bound memory; excess conditions are
+                # silently dropped (conservative: SMT may miss some prunings, never
+                # wrongly classify a useful lock as useless).
+                merged_conds = dict.fromkeys(
+                    prev_state.path_conditions + incoming_state.path_conditions
+                )
+                joined_conds = tuple(list(merged_conds)[:MAX_PATH_CONDITIONS])
                 joined_state = LockState(lockset=joined_lockset, path_conditions=joined_conds)
-
-                if joined_state.lockset == prev_state.lockset and len(joined_conds) == len(prev_state.path_conditions):
-                    continue  # Fixed point reached for this block
-
                 block_entry_states[block_name] = joined_state
                 incoming_state = joined_state
             else:
@@ -135,7 +161,7 @@ class LocksetAnalyzer:
             # Propagate updated state to successors
             for succ_name in block.successors:
                 if succ_name in cfg.blocks:
-                    worklist.put((succ_name, current_state))
+                    worklist.append((succ_name, current_state))
 
         return instruction_states
 
