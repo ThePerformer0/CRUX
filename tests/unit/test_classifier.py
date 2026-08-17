@@ -8,7 +8,7 @@ from src.core.classifier import Classifier
 
 def test_classify_empty_cs():
     """Verify lock site with empty critical section is classified as EMPTY_CS."""
-    site = LockSite(site_id="s1", mutex_canonical_id="%m", mutex_name="%m", function="foo")
+    site = LockSite(site_id="s1", mutex_canonical_id="%m", mutex_name="%m", function="foo", unlock_source_lines=[10])
     lsg = LockSiteGraph()
     lsg.build_graph([site])
 
@@ -22,7 +22,7 @@ def test_classify_empty_cs():
 def test_classify_local_vars():
     """Verify lock site accessing only stack-local %alloca variables is classified as LOCAL_VARS."""
     site = LockSite(site_id="s1", mutex_canonical_id="%m", mutex_name="%m", function="foo",
-                    reads={"%local_x"}, writes={"%local_y"})
+                    reads={"%local_x"}, writes={"%local_y"}, unlock_source_lines=[10])
     lsg = LockSiteGraph()
     lsg.build_graph([site])
 
@@ -35,8 +35,8 @@ def test_classify_local_vars():
 
 def test_classify_read_only():
     """Verify lock site performing only reads on global variables without writes is classified as READ_ONLY."""
-    site1 = LockSite(site_id="s1", mutex_canonical_id="%m1", mutex_name="%m1", function="f1", reads={"@global_var"})
-    site2 = LockSite(site_id="s2", mutex_canonical_id="%m2", mutex_name="%m2", function="f2", reads={"@global_var"})
+    site1 = LockSite(site_id="s1", mutex_canonical_id="%m1", mutex_name="%m1", function="f1", reads={"@global_var"}, unlock_source_lines=[10])
+    site2 = LockSite(site_id="s2", mutex_canonical_id="%m2", mutex_name="%m2", function="f2", reads={"@global_var"}, unlock_source_lines=[20])
 
     lsg = LockSiteGraph()
     lsg.build_graph([site1, site2])
@@ -52,9 +52,10 @@ def test_classify_read_only():
 def test_classify_redundant():
     """Verify nested child lock site covered by parent lock is classified as REDUNDANT."""
     s1 = LockSite(site_id="s1", mutex_canonical_id="%m_parent", mutex_name="%m_parent", function="f1",
-                  writes={"@global_var"})
-    s2 = LockSite(site_id="s2", mutex_canonical_id="%m_child", mutex_name="%m_child", function="f2",
-                  writes={"@global_var"}, lockset_at_entry=frozenset(["%m_parent"]))
+                  writes={"@global_var"}, lock_source_line=10, unlock_source_lines=[50])
+    s2 = LockSite(site_id="s2", mutex_canonical_id="%m_child", mutex_name="%m_child", function="f1",
+                  writes={"@global_var"}, lock_source_line=20, unlock_source_lines=[30],
+                  lockset_at_entry=frozenset(["%m_parent"]))
 
     lsg = LockSiteGraph()
     lsg.build_graph([s1, s2])

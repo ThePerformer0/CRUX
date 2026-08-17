@@ -57,6 +57,10 @@ class CallGraph:
         """Returns direct callers for a given function."""
         return self.callers.get(func, [])
 
+    def has_call(self, caller: str, callee: str) -> bool:
+        """Returns True if caller directly calls callee."""
+        return callee in self.calls.get(caller, [])
+
     def get_transitive_callees(self, func: str, visited: Optional[Set[str]] = None) -> Set[str]:
         """Returns all functions transitively called by func, handling cycles/recursion iteratively."""
         if visited is None and func in self._transitive_cache:

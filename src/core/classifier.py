@@ -106,4 +106,8 @@ class Classifier:
         if site.mutex_is_recursive:
             filtered = [r for r in filtered if r != "REDUNDANT"]
 
+        # Guard 4: Escaping lock / wrapper function (no intra-procedural unlock found)
+        if not site.unlock_source_lines:
+            filtered = [r for r in filtered if r in ("SINGLE_THREAD",)]
+
         return filtered

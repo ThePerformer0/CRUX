@@ -87,8 +87,15 @@ class LockSiteGraph:
                 if parent_mutex_id in self.sites_by_mutex:
                     for parent_site in self.sites_by_mutex[parent_mutex_id]:
                         if parent_site.site_id != child_site.site_id:
-                            self.graph.add_edge(parent_site.site_id, child_site.site_id,
-                                                key=EdgeKind.NEST.value, kind=EdgeKind.NEST)
+                            if parent_site.function == child_site.function:
+                                if parent_site.lock_source_line <= child_site.lock_source_line:
+                                    self.graph.add_edge(parent_site.site_id, child_site.site_id,
+                                                        key=EdgeKind.NEST.value, kind=EdgeKind.NEST)
+                            else:
+                                if self.call_graph.has_call(parent_site.function, child_site.function) or \
+                                   child_site.function in self.call_graph.get_transitive_callees(parent_site.function):
+                                    self.graph.add_edge(parent_site.site_id, child_site.site_id,
+                                                        key=EdgeKind.NEST.value, kind=EdgeKind.NEST)
 
     def _build_hb_edges(self) -> None:
         """Constructs HB (Happens-Before) edges for statically ordered execution phases."""

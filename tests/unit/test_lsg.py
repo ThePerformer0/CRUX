@@ -43,9 +43,10 @@ def test_no_share_edge_on_read_only():
 
 def test_nest_edge_creation():
     """Verify NEST edge is created from parent lock to child nested lock site."""
-    s1 = LockSite(site_id="s1", mutex_canonical_id="%m_parent", mutex_name="%m_parent", function="f1")
-    s2 = LockSite(site_id="s2", mutex_canonical_id="%m_child", mutex_name="%m_child", function="f2",
-                  lockset_at_entry=frozenset(["%m_parent"]))
+    s1 = LockSite(site_id="s1", mutex_canonical_id="%m_parent", mutex_name="%m_parent", function="f1",
+                  lock_source_line=10, unlock_source_lines=[30])
+    s2 = LockSite(site_id="s2", mutex_canonical_id="%m_child", mutex_name="%m_child", function="f1",
+                  lock_source_line=20, unlock_source_lines=[25], lockset_at_entry=frozenset(["%m_parent"]))
 
     lsg = LockSiteGraph()
     lsg.build_graph([s1, s2])
