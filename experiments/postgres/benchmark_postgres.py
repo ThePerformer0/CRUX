@@ -19,16 +19,25 @@ PGBENCH_THREADS = 4
 PGBENCH_TIME_SEC = 10
 PG_PORT = 5433
 PG_DATA = "/tmp/pgdata_bench"
-PG_BIN = os.path.expanduser("~/postgresql-16.1/src/bin/pg_ctl/pg_ctl")
-PGBENCH_BIN = os.path.expanduser("~/postgresql-16.1/src/bin/pgbench/pgbench")
-INITDB_BIN = os.path.expanduser("~/postgresql-16.1/src/bin/initdb/initdb")
+BIN_DIR = "/tmp/pg_bin"
+PG_BIN = f"{BIN_DIR}/pg_ctl"
+PGBENCH_BIN = f"{BIN_DIR}/pgbench"
+INITDB_BIN = f"{BIN_DIR}/initdb"
 POSTGRES_DIR = os.path.expanduser("~/postgresql-16.1")
 LIBPQ_DIR = os.path.join(POSTGRES_DIR, "src/interfaces/libpq")
 BACKEND_DIR = os.path.join(POSTGRES_DIR, "src/backend")
 
 # Set dynamic linker library path for libpq.so.5 and binary search paths
 os.environ["LD_LIBRARY_PATH"] = f"{LIBPQ_DIR}:" + os.environ.get("LD_LIBRARY_PATH", "")
-os.environ["PATH"] = f"{BACKEND_DIR}:{POSTGRES_DIR}/src/bin/initdb:{POSTGRES_DIR}/src/bin/pg_ctl:{POSTGRES_DIR}/src/bin/pgbench:" + os.environ.get("PATH", "")
+os.environ["PATH"] = f"{BIN_DIR}:{BACKEND_DIR}:" + os.environ.get("PATH", "")
+
+
+def setup_bin_symlinks():
+    os.makedirs(BIN_DIR, exist_ok=True)
+    run_cmd(f"ln -sf {POSTGRES_DIR}/src/backend/postgres {BIN_DIR}/postgres")
+    run_cmd(f"ln -sf {POSTGRES_DIR}/src/bin/initdb/initdb {BIN_DIR}/initdb")
+    run_cmd(f"ln -sf {POSTGRES_DIR}/src/bin/pg_ctl/pg_ctl {BIN_DIR}/pg_ctl")
+    run_cmd(f"ln -sf {POSTGRES_DIR}/src/bin/pgbench/pgbench {BIN_DIR}/pgbench")
 
 
 def run_cmd(cmd: str, check: bool = True) -> str:
@@ -41,16 +50,18 @@ def run_cmd(cmd: str, check: bool = True) -> str:
 
 def setup_cluster():
     print("[SETUP] Initializing clean PostgreSQL test cluster...")
+    setup_bin_symlinks()
     run_cmd(f"rm -rf {PG_DATA}")
     
-    # Try initdb with -L flag if needed
-    init_res = run_cmd(f"{INITDB_BIN} -D {PG_DATA} -L {POSTGRES_DIR}/src/backend --no-locale -E UTF8", check=False)
-    if "error" in init_res.lower() or not os.path.exists(PG_DATA):
-        # Fallback to standard initdb
-        run_cmd(f"{INITDB_BIN} -D {PG_DATA} --no-locale -E UTF8")
-        
+    run_cmd(f"{INITDB_BIN} -D {PG_DATA} -L {BACKEND_DIR} --no-locale -E UTF8")
     run_cmd(f"{PG_BIN} -D {PG_DATA} -o '-p {PG_PORT} -k /tmp' -l /tmp/pg_bench.log start")
-    time.sleep(2)
+    
+    # Wait for server ready
+    for _ in range(10):
+        if os.path.exists(f"/tmp/.s.PGSQL.{PG_PORT}"):
+            break
+        time.sleep(0.5)
+        
     run_cmd(f"{PGBENCH_BIN} -i -s 10 -p {PG_PORT} -h /tmp postgres")
 
 
