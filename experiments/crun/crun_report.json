@@ -1,0 +1,23 @@
+{
+  "metadata": {
+    "tool": "crux",
+    "version": "3.0",
+    "llvm_ir_file": "/users/Jim0/bitcodes/crun_O0.ll",
+    "analysis_time_seconds": 5.5,
+    "alias_analysis": "field-based",
+    "interprocedural": true,
+    "smt_enabled": true
+  },
+  "summary": {
+    "total_sites": 0,
+    "useless_sites": 0,
+    "useful_sites": 0,
+    "edges": {
+      "share": 0,
+      "nest": 0,
+      "hb": 0
+    }
+  },
+  "useless_sites": [],
+  "warnings": []
+}
