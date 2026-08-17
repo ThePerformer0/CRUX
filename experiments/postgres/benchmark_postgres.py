@@ -23,10 +23,17 @@ PG_BIN = os.path.expanduser("~/postgresql-16.1/src/bin/pg_ctl/pg_ctl")
 PGBENCH_BIN = os.path.expanduser("~/postgresql-16.1/src/bin/pgbench/pgbench")
 INITDB_BIN = os.path.expanduser("~/postgresql-16.1/src/bin/initdb/initdb")
 POSTGRES_DIR = os.path.expanduser("~/postgresql-16.1")
+LIBPQ_DIR = os.path.join(POSTGRES_DIR, "src/interfaces/libpq")
+BACKEND_DIR = os.path.join(POSTGRES_DIR, "src/backend")
+
+# Set dynamic linker library path for libpq.so.5 and binary search paths
+os.environ["LD_LIBRARY_PATH"] = f"{LIBPQ_DIR}:" + os.environ.get("LD_LIBRARY_PATH", "")
+os.environ["PATH"] = f"{BACKEND_DIR}:{POSTGRES_DIR}/src/bin/initdb:{POSTGRES_DIR}/src/bin/pg_ctl:{POSTGRES_DIR}/src/bin/pgbench:" + os.environ.get("PATH", "")
 
 
 def run_cmd(cmd: str, check: bool = True) -> str:
-    res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    env = os.environ.copy()
+    res = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
     if check and res.returncode != 0:
         print(f"[ERROR] Command failed: {cmd}\nStderr: {res.stderr}")
     return res.stdout
@@ -35,10 +42,16 @@ def run_cmd(cmd: str, check: bool = True) -> str:
 def setup_cluster():
     print("[SETUP] Initializing clean PostgreSQL test cluster...")
     run_cmd(f"rm -rf {PG_DATA}")
-    run_cmd(f"{INITDB_BIN} -D {PG_DATA} --no-locale -E UTF8")
-    run_cmd(f"{PG_BIN} -D {PG_DATA} -o '-p {PG_PORT}' -l /tmp/pg_bench.log start")
+    
+    # Try initdb with -L flag if needed
+    init_res = run_cmd(f"{INITDB_BIN} -D {PG_DATA} -L {POSTGRES_DIR}/src/backend --no-locale -E UTF8", check=False)
+    if "error" in init_res.lower() or not os.path.exists(PG_DATA):
+        # Fallback to standard initdb
+        run_cmd(f"{INITDB_BIN} -D {PG_DATA} --no-locale -E UTF8")
+        
+    run_cmd(f"{PG_BIN} -D {PG_DATA} -o '-p {PG_PORT} -k /tmp' -l /tmp/pg_bench.log start")
     time.sleep(2)
-    run_cmd(f"{PGBENCH_BIN} -i -s 10 -p {PG_PORT} postgres")
+    run_cmd(f"{PGBENCH_BIN} -i -s 10 -p {PG_PORT} -h /tmp postgres")
 
 
 def stop_cluster():
@@ -56,7 +69,7 @@ def run_benchmark_series(label: str):
         print(f"[{label}] Run {i}/{NUM_RUNS} ... ", end="", flush=True)
         
         # 1. Run pgbench workload
-        cmd = f"{PGBENCH_BIN} -c {PGBENCH_CLIENTS} -j {PGBENCH_THREADS} -T {PGBENCH_TIME_SEC} -p {PG_PORT} postgres"
+        cmd = f"{PGBENCH_BIN} -c {PGBENCH_CLIENTS} -j {PGBENCH_THREADS} -T {PGBENCH_TIME_SEC} -p {PG_PORT} -h /tmp postgres"
         out = run_cmd(cmd)
         
         tps = 0.0
@@ -75,7 +88,7 @@ def run_benchmark_series(label: str):
         
         # 2. Measure server recovery / restart time (triggers TrimMultiXact)
         t0 = time.time()
-        run_cmd(f"{PG_BIN} -D {PG_DATA} restart -m fast -o '-p {PG_PORT}' -l /tmp/pg_bench.log")
+        run_cmd(f"{PG_BIN} -D {PG_DATA} restart -m fast -o '-p {PG_PORT} -k /tmp' -l /tmp/pg_bench.log")
         restart_time_ms = (time.time() - t0) * 1000.0
         
         tps_results.append(tps)
