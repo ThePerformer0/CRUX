@@ -22,40 +22,106 @@ from src.analysis.alias_resolver import AliasResolver
 MAX_PATH_CONDITIONS: int = 32
 
 LOCK_FUNCTIONS: Set[str] = {
-    # POSIX
-    "pthread_mutex_lock", "pthread_mutex_trylock",
-    "pthread_rwlock_rdlock", "pthread_rwlock_wrlock",
-    "pthread_spin_lock",
-    # C11
+    # POSIX Threads
+    "pthread_mutex_lock", "pthread_mutex_trylock", "pthread_mutex_timedlock",
+    "pthread_rwlock_rdlock", "pthread_rwlock_wrlock", "pthread_rwlock_tryrdlock", "pthread_rwlock_trywrlock",
+    "pthread_spin_lock", "pthread_spin_trylock",
+    # C11 Threads
     "mtx_lock", "mtx_timedlock", "mtx_trylock",
-    # Linux kernel
-    "mutex_lock", "mutex_lock_interruptible",
-    "spin_lock", "spin_lock_irq", "spin_lock_irqsave",
-    "down_read", "down_write", "raw_spin_lock",
-    # Custom / Libraries
+    # Linux Kernel
+    "mutex_lock", "mutex_lock_interruptible", "mutex_lock_killable", "mutex_trylock",
+    "spin_lock", "spin_lock_irq", "spin_lock_irqsave", "spin_lock_bh", "spin_trylock",
+    "raw_spin_lock", "raw_spin_lock_irq", "raw_spin_lock_irqsave",
+    "down_read", "down_read_trylock", "down_write", "down_write_trylock",
+    "read_lock", "read_lock_irqsave", "write_lock", "write_lock_irqsave",
+    # PostgreSQL
+    "LWLockAcquire", "LWLockAcquireOrWait", "LWLockConditionalAcquire",
+    "SpinLockAcquire", "s_lock",
+    # SQLite3
+    "sqlite3_mutex_enter", "sqlite3_mutex_try",
+    # NGINX
+    "ngx_thread_mutex_lock", "ngx_shmtx_lock", "ngx_shmtx_trylock",
+    "ngx_rwlock_wrlock", "ngx_rwlock_rdlock", "ngx_spinlock",
+    # OpenMPI / OPAL
+    "opal_mutex_lock", "opal_mutex_trylock", "opal_atomic_lock",
+    "opal_rwlock_rdlock", "opal_rwlock_wrlock",
+    # RocksDB & LevelDB (C++ mangled & demangled)
+    "_ZN7rocksdb4port5Mutex4LockEv", "_ZN7rocksdb4port5Mutex7TryLockEv",
+    "_ZN7rocksdb4port7RWMutex6ReadLockEv", "_ZN7rocksdb4port7RWMutex7WriteLockEv",
+    "_ZN7rocksdb17InstrumentedMutex4LockEv", "_ZN7rocksdb17InstrumentedMutex7TryLockEv",
+    "_ZN7rocksdb19InstrumentedRWMutex6ReadLockEv", "_ZN7rocksdb19InstrumentedRWMutex7WriteLockEv",
+    "_ZN7rocksdb9SpinMutex4lockEv", "_ZN7rocksdb9SpinMutex8try_lockEv",
+    "_ZN7leveldb4port5Mutex4LockEv",
+    # Apache HTTPD / APR
+    "apr_thread_mutex_lock", "apr_thread_mutex_trylock", "apr_thread_mutex_timedlock",
+    "apr_proc_mutex_lock", "apr_proc_mutex_trylock", "apr_proc_mutex_timedlock",
+    "apr_thread_rwlock_rdlock", "apr_thread_rwlock_wrlock", "apr_thread_rwlock_tryrdlock", "apr_thread_rwlock_trywrlock",
+    "apr_global_mutex_lock", "apr_global_mutex_trylock",
+    # HAProxy
+    "_ha_rwlock_wrlock", "_ha_rwlock_rdlock", "_ha_spinlock_lock", "pl_take",
+    "HA_SPIN_LOCK", "HA_RWLOCK_WRLOCK", "HA_RWLOCK_RDLOCK",
+    # Varnish Cache
+    "Lck_Lock", "Lck_LockHdl", "Lck_Trylock",
+    # GLib / GObject
+    "g_mutex_lock", "g_mutex_trylock", "g_rec_mutex_lock", "g_rec_mutex_trylock",
+    "g_rw_lock_reader_lock", "g_rw_lock_reader_trylock", "g_rw_lock_writer_lock", "g_rw_lock_writer_trylock",
+    # librdkafka
     "rd_kafka_rdlock", "rd_kafka_wrlock", "rd_kafka_toppar_lock",
-    "LWLockAcquire", "SpinLockAcquire",
-    "ngx_thread_mutex_lock", "ngx_shmtx_lock",
-    "sqlite3_mutex_enter",
-    # C++ (mangled)
-    "_ZNSt5mutex4lockEv",
+    # C++ std::mutex & std::shared_mutex (mangled)
+    "_ZNSt5mutex4lockEv", "_ZNSt5mutex8try_lockEv",
+    "_ZNSt10timed_mutex4lockEv", "_ZNSt10timed_mutex8try_lockEv",
+    "_ZNSt15recursive_mutex4lockEv", "_ZNSt15recursive_mutex8try_lockEv",
+    "_ZNSt11unique_lockISt5mutexE4lockEv",
+    "_ZNSt14shared_timed_mutex11lock_sharedEv", "_ZNSt14shared_timed_mutex4lockEv",
+    "_ZNSt12shared_mutex11lock_sharedEv", "_ZNSt12shared_mutex4lockEv",
+    # Poco C++
+    "_ZN4Poco9FastMutex4lockEv", "_ZN4Poco5Mutex4lockEv",
 }
 
 UNLOCK_FUNCTIONS: Set[str] = {
-    # POSIX
+    # POSIX Threads
     "pthread_mutex_unlock", "pthread_rwlock_unlock", "pthread_spin_unlock",
-    # C11
+    # C11 Threads
     "mtx_unlock",
-    # Linux kernel
-    "mutex_unlock", "spin_unlock", "spin_unlock_irq", "spin_unlock_irqrestore",
-    "up_read", "up_write", "raw_spin_unlock",
-    # Custom / Libraries
-    "rd_kafka_rdunlock", "rd_kafka_wrunlock", "rd_kafka_toppar_unlock",
-    "LWLockRelease", "SpinLockRelease",
-    "ngx_thread_mutex_unlock", "ngx_shmtx_unlock",
+    # Linux Kernel
+    "mutex_unlock", "spin_unlock", "spin_unlock_irq", "spin_unlock_irqrestore", "spin_unlock_bh",
+    "raw_spin_unlock", "raw_spin_unlock_irq", "raw_spin_unlock_irqrestore",
+    "up_read", "up_write",
+    "read_unlock", "read_unlock_irqrestore", "write_unlock", "write_unlock_irqrestore",
+    # PostgreSQL
+    "LWLockRelease", "LWLockReleaseClearParticipant",
+    "SpinLockRelease", "s_unlock",
+    # SQLite3
     "sqlite3_mutex_leave",
-    # C++ (mangled)
-    "_ZNSt5mutex6unlockEv",
+    # NGINX
+    "ngx_thread_mutex_unlock", "ngx_shmtx_unlock", "ngx_rwlock_unlock",
+    # OpenMPI / OPAL
+    "opal_mutex_unlock", "opal_atomic_unlock", "opal_rwlock_unlock",
+    # RocksDB & LevelDB (C++ mangled & demangled)
+    "_ZN7rocksdb4port5Mutex6UnlockEv",
+    "_ZN7rocksdb4port7RWMutex8ReadUnlockEv", "_ZN7rocksdb4port7RWMutex9WriteUnlockEv",
+    "_ZN7rocksdb17InstrumentedMutex6UnlockEv",
+    "_ZN7rocksdb19InstrumentedRWMutex8ReadUnlockEv", "_ZN7rocksdb19InstrumentedRWMutex9WriteUnlockEv",
+    "_ZN7rocksdb9SpinMutex6unlockEv",
+    "_ZN7leveldb4port5Mutex6UnlockEv",
+    # Apache HTTPD / APR
+    "apr_thread_mutex_unlock", "apr_proc_mutex_unlock", "apr_thread_rwlock_unlock", "apr_global_mutex_unlock",
+    # HAProxy
+    "_ha_rwlock_wrunlock", "_ha_rwlock_rdunlock", "_ha_spinlock_unlock", "pl_drop",
+    "HA_SPIN_UNLOCK", "HA_RWLOCK_WRUNLOCK", "HA_RWLOCK_RDUNLOCK",
+    # Varnish Cache
+    "Lck_Unlock", "Lck_UnlockHdl",
+    # GLib / GObject
+    "g_mutex_unlock", "g_rec_mutex_unlock", "g_rw_lock_reader_unlock", "g_rw_lock_writer_unlock",
+    # librdkafka
+    "rd_kafka_rdunlock", "rd_kafka_wrunlock", "rd_kafka_toppar_unlock",
+    # C++ std::mutex & std::shared_mutex (mangled)
+    "_ZNSt5mutex6unlockEv", "_ZNSt10timed_mutex6unlockEv", "_ZNSt15recursive_mutex6unlockEv",
+    "_ZNSt11unique_lockISt5mutexE6unlockEv",
+    "_ZNSt14shared_timed_mutex13unlock_sharedEv", "_ZNSt14shared_timed_mutex6unlockEv",
+    "_ZNSt12shared_mutex13unlock_sharedEv", "_ZNSt12shared_mutex6unlockEv",
+    # Poco C++
+    "_ZN4Poco9FastMutex6unlockEv", "_ZN4Poco5Mutex6unlockEv",
 }
 
 COND_WAIT_FUNCTIONS: Set[str] = {
