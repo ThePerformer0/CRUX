@@ -67,6 +67,11 @@ LOCK_FUNCTIONS: Set[str] = {
     "g_rw_lock_reader_lock", "g_rw_lock_reader_trylock", "g_rw_lock_writer_lock", "g_rw_lock_writer_trylock",
     # librdkafka
     "rd_kafka_rdlock", "rd_kafka_wrlock", "rd_kafka_toppar_lock",
+    # Xen Hypervisor
+    "_spin_lock", "_spin_lock_irq", "_spin_lock_irqsave", "_spin_lock_cb", "_spin_trylock",
+    "spin_lock_recursive", "_read_lock", "_read_lock_irq", "_read_lock_irqsave", "_read_trylock",
+    "_write_lock", "_write_lock_irq", "_write_lock_irqsave", "_write_trylock",
+    "percpu_read_lock", "percpu_write_lock", "grant_read_lock", "grant_write_lock",
     # C++ std::mutex & std::shared_mutex (mangled)
     "_ZNSt5mutex4lockEv", "_ZNSt5mutex8try_lockEv",
     "_ZNSt10timed_mutex4lockEv", "_ZNSt10timed_mutex8try_lockEv",
@@ -115,6 +120,11 @@ UNLOCK_FUNCTIONS: Set[str] = {
     "g_mutex_unlock", "g_rec_mutex_unlock", "g_rw_lock_reader_unlock", "g_rw_lock_writer_unlock",
     # librdkafka
     "rd_kafka_rdunlock", "rd_kafka_wrunlock", "rd_kafka_toppar_unlock",
+    # Xen Hypervisor
+    "_spin_unlock", "_spin_unlock_irq", "_spin_unlock_irqrestore",
+    "spin_unlock_recursive", "_read_unlock", "_read_unlock_irq", "_read_unlock_irqrestore",
+    "_write_unlock", "_write_unlock_irq", "_write_unlock_irqrestore",
+    "percpu_read_unlock", "percpu_write_unlock", "grant_read_unlock", "grant_write_unlock",
     # C++ std::mutex & std::shared_mutex (mangled)
     "_ZNSt5mutex6unlockEv", "_ZNSt10timed_mutex6unlockEv", "_ZNSt15recursive_mutex6unlockEv",
     "_ZNSt11unique_lockISt5mutexE6unlockEv",
