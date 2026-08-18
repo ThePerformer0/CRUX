@@ -1,0 +1,492 @@
+{
+  "metadata": {
+    "tool": "crux",
+    "version": "3.0",
+    "llvm_ir_file": "/users/Jim0/bitcodes/xen_O0.ll",
+    "analysis_time_seconds": 208.16,
+    "alias_analysis": "field-based",
+    "interprocedural": true,
+    "smt_enabled": true
+  },
+  "summary": {
+    "total_sites": 821,
+    "useless_sites": 27,
+    "useful_sites": 794,
+    "edges": {
+      "share": 449200,
+      "nest": 51,
+      "hb": 0
+    }
+  },
+  "useless_sites": [
+    {
+      "id": "s49",
+      "mutex_name": "%1586",
+      "function": "do_grant_table_op",
+      "source_file": "./include/xen/rwlock.h",
+      "lock_source_line": 347,
+      "unlock_source_lines": [
+        351
+      ],
+      "reasons": [
+        "THREAD_LOCAL"
+      ]
+    },
+    {
+      "id": "s78",
+      "mutex_name": "%17",
+      "function": "acquire_grant_for_copy",
+      "source_file": "common/grant_table.c",
+      "lock_source_line": 2683,
+      "unlock_source_lines": [
+        2718,
+        2691,
+        2718,
+        2691,
+        2718,
+        2718,
+        2718,
+        379,
+        2718,
+        2718,
+        2718
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s80",
+      "mutex_name": "%17",
+      "function": "acquire_grant_for_copy",
+      "source_file": "common/grant_table.c",
+      "lock_source_line": 2723,
+      "unlock_source_lines": [
+        2727,
+        2727
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s118",
+      "mutex_name": "%47",
+      "function": "sched_unit_migrate_finish",
+      "source_file": "common/sched/core.c",
+      "lock_source_line": 366,
+      "unlock_source_lines": [
+        375,
+        375,
+        375,
+        375,
+        375,
+        375,
+        375
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s147",
+      "mutex_name": "%97",
+      "function": "null_dump",
+      "source_file": "common/sched/null.c",
+      "lock_source_line": 1014,
+      "unlock_source_lines": [
+        1026,
+        1026
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s226",
+      "mutex_name": "@heap_lock",
+      "function": "domain_set_outstanding_pages",
+      "source_file": "common/page_alloc.c",
+      "lock_source_line": 519,
+      "unlock_source_lines": [
+        563,
+        563,
+        563,
+        563,
+        563,
+        563
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s235",
+      "mutex_name": "@heap_lock",
+      "function": "init_heap_pages",
+      "source_file": "common/page_alloc.c",
+      "lock_source_line": 1873,
+      "unlock_source_lines": [
+        1875
+      ],
+      "reasons": [
+        "THREAD_LOCAL"
+      ]
+    },
+    {
+      "id": "s276",
+      "mutex_name": "@domctl_lock",
+      "function": "do_domctl",
+      "source_file": "common/domctl.c",
+      "lock_source_line": 143,
+      "unlock_source_lines": [
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152,
+        152
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s277",
+      "mutex_name": "%432",
+      "function": "do_domctl",
+      "source_file": "common/domctl.c",
+      "lock_source_line": 624,
+      "unlock_source_lines": [
+        631
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s278",
+      "mutex_name": "%648",
+      "function": "do_domctl",
+      "source_file": "common/domctl.c",
+      "lock_source_line": 826,
+      "unlock_source_lines": [
+        829
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s322",
+      "mutex_name": "@i8259A_lock",
+      "function": "mask_8259A",
+      "source_file": "arch/x86/i8259.c",
+      "lock_source_line": 151,
+      "unlock_source_lines": [
+        154
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s336",
+      "mutex_name": "@mce_logout_lock",
+      "function": "mcheck_cmn_handler",
+      "source_file": "arch/x86/cpu/mcheck/mce.c",
+      "lock_source_line": 424,
+      "unlock_source_lines": [
+        433,
+        433,
+        433,
+        433,
+        433
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s434",
+      "mutex_name": "%61",
+      "function": "pt_adjust_vcpu",
+      "source_file": "arch/x86/hvm/vpt.c",
+      "lock_source_line": 155,
+      "unlock_source_lines": [
+        160,
+        160
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s453",
+      "mutex_name": "%83",
+      "function": "vmx_pi_desc_fixup",
+      "source_file": "arch/x86/hvm/vmx/vmx.c",
+      "lock_source_line": 246,
+      "unlock_source_lines": [
+        258
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s471",
+      "mutex_name": "%9",
+      "function": "irq_ratelimit_timer_fn",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 948,
+      "unlock_source_lines": [
+        952
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s474",
+      "mutex_name": "@vector_lock",
+      "function": "bind_irq_vector",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 189,
+      "unlock_source_lines": [
+        191,
+        191,
+        191,
+        191
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s476",
+      "mutex_name": "@vector_lock",
+      "function": "clear_irq_vector",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 253,
+      "unlock_source_lines": [
+        255
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s478",
+      "mutex_name": "@vector_lock",
+      "function": "assign_irq_vector",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 661,
+      "unlock_source_lines": [
+        663
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s481",
+      "mutex_name": "@vector_lock",
+      "function": "destroy_irq",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 357,
+      "unlock_source_lines": [
+        359
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s503",
+      "mutex_name": "@irq_ratelimit_lock",
+      "function": "do_IRQ",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 1968,
+      "unlock_source_lines": [
+        1972,
+        1972
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s507",
+      "mutex_name": "%243",
+      "function": "map_domain_pirq",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 2257,
+      "unlock_source_lines": [
+        2260
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s512",
+      "mutex_name": "@vector_lock",
+      "function": "fixup_irqs",
+      "source_file": "arch/x86/irq.c",
+      "lock_source_line": 2598,
+      "unlock_source_lines": [
+        2601,
+        2601
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s552",
+      "mutex_name": "%71",
+      "function": "audit_p2m",
+      "source_file": "arch/x86/mm/p2m.c",
+      "lock_source_line": 2228,
+      "unlock_source_lines": [
+        2280,
+        2280
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s700",
+      "mutex_name": "%296",
+      "function": "enable_iommu",
+      "source_file": "drivers/passthrough/amd/iommu_init.c",
+      "lock_source_line": 887,
+      "unlock_source_lines": [
+        897,
+        892
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s726",
+      "mutex_name": "%124",
+      "function": "pci_remove_device",
+      "source_file": "drivers/passthrough/pci.c",
+      "lock_source_line": 436,
+      "unlock_source_lines": [
+        439,
+        439
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s779",
+      "mutex_name": "%12",
+      "function": "domain_context_mapping_one",
+      "source_file": "drivers/passthrough/vtd/iommu.c",
+      "lock_source_line": 1534,
+      "unlock_source_lines": [
+        1539,
+        1553,
+        1553
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s799",
+      "mutex_name": "%4",
+      "function": "serial_tx_interrupt",
+      "source_file": "drivers/char/serial.c",
+      "lock_source_line": 84,
+      "unlock_source_lines": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    }
+  ],
+  "warnings": [
+    "455 sites contain unresolved indirect calls (CHA fallback applied)."
+  ]
+}
