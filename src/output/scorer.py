@@ -47,6 +47,10 @@ def compute_confidence_score(site: LockSite, lsg: LockSiteGraph) -> float:
     if "EMPTY_CS" in site.reasons:
         score *= 1.2
 
+    # Conservative weighting for THREAD_LOCAL (since C lacks managed escape analysis)
+    if "THREAD_LOCAL" in site.reasons and len(site.reasons) == 1:
+        score *= 0.75
+
     score = min(score, 1.0)
     score = max(score, 0.0)
     return round(score, 2)
@@ -65,5 +69,6 @@ def suggest_fix(site: LockSite) -> str:
     if "SINGLE_THREAD" in site.reasons:
         return "Supprimer le verrou : ce code s'exécute avant toute création de thread."
     if "THREAD_LOCAL" in site.reasons:
-        return "Supprimer le verrou : les variables manipulées sont strictement locales au thread."
+        return "Vérifier l'absence de partage global (motif conservatif) : les variables manipulées n'ont aucun conflit concurrent observé."
     return ""
+
