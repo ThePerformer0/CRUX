@@ -81,3 +81,14 @@ def test_e2e_useful():
     report = run_crux_pipeline("test_useful.ll")
     assert report["summary"]["total_sites"] == 2
     assert report["summary"]["useless_sites"] == 0
+
+
+def test_e2e_interprocedural_redundant():
+    """Verify Crux detects interprocedural REDUNDANT lock across caller and callee."""
+    report = run_crux_pipeline("test_interprocedural_redundant.ll")
+    assert report["summary"]["total_sites"] == 2
+    assert report["summary"]["useless_sites"] == 1
+    useless = report["useless_sites"][0]
+    assert useless["function"] == "inner_worker"
+    assert "REDUNDANT" in useless["reasons"]
+

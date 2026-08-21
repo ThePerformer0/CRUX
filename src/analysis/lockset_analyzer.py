@@ -146,12 +146,25 @@ class LockState:
     path_conditions: Tuple[str, ...] = field(default_factory=tuple)
 
 
+@dataclass
+class FunctionLockSummary:
+    """Interprocedural lock effect summary for a function.
+
+    Captures net lock acquisitions (locks acquired and not released upon return)
+    and net releases (locks released without prior acquisition).
+    """
+    net_acquires: Set[str] = field(default_factory=set)
+    net_releases: Set[str] = field(default_factory=set)
+    is_balanced: bool = True
+
+
 # Regex to extract first argument register from call/invoke
 MUTEX_ARG_PATTERN = re.compile(r"(?:call|invoke)\s+.*@(?:[a-zA-Z0-9_$.]+)\s*\(\s*(?:[^\(\),]+\s+)?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
+CALL_TARGET_WITH_ARGS_PATTERN = re.compile(r"(?:call|invoke)\s+.*@([a-zA-Z0-9_$.]+)\s*\((.*?)\)")
 
 
 class LocksetAnalyzer:
-    """Computes locksets per instruction across CFGs using BFS dataflow analysis."""
+    """Computes locksets per instruction across CFGs using intra- and interprocedural dataflow analysis."""
 
     def __init__(self, alias_resolver: AliasResolver,
                  custom_locks: Optional[Set[str]] = None,
@@ -166,33 +179,34 @@ class LocksetAnalyzer:
             self.unlock_funcs.update(custom_unlocks)
 
         self.cond_wait_funcs = set(COND_WAIT_FUNCTIONS)
+        self.function_summaries: Dict[str, FunctionLockSummary] = {}
+        self.function_entry_locksets: Dict[str, FrozenSet[str]] = {}
 
-    def analyze_cfg(self, cfg: CFG) -> Dict[str, List[LockState]]:
-        """Performs BFS Lockset Analysis on a single CFG.
+    def analyze_cfg(self, cfg: CFG,
+                    initial_lockset: FrozenSet[str] = frozenset(),
+                    function_summaries: Optional[Dict[str, FunctionLockSummary]] = None) -> Dict[str, List[LockState]]:
+        """Performs BFS Lockset Analysis on a single CFG with support for initial entry locksets and summaries.
 
         Fixpoint criterion: lockset only (finite lattice → guaranteed termination).
-        Path conditions are collected along paths and merged conservatively at join
-        points, but they do NOT participate in the fixpoint check — the lattice of
-        path-condition sets is infinite, so including them would prevent convergence
-        on functions containing loops or multiple back-edges.
 
         Args:
             cfg: CFG instance for a function.
+            initial_lockset: Inherited lockset at function entry (top-down interprocedural context).
+            function_summaries: Precomputed lock effect summaries for called functions.
 
         Returns:
             Dictionary mapping block_name -> List of LockState per instruction in that block.
         """
-        # Maps block_name -> stable LockState at block entry (None = not yet visited)
         block_entry_states: Dict[str, Optional[LockState]] = {b: None for b in cfg.blocks}
         instruction_states: Dict[str, List[LockState]] = {b: [] for b in cfg.blocks}
 
         if not cfg.blocks or cfg.entry_block not in cfg.blocks:
             return instruction_states
 
-        # Use a plain deque (not thread-safe Queue) — analysis is single-threaded.
-        # This removes all threading lock overhead from every put/get.
+        summaries = function_summaries if function_summaries is not None else self.function_summaries
+
         worklist: Deque[Tuple[str, LockState]] = deque()
-        initial_state = LockState(lockset=frozenset(), path_conditions=())
+        initial_state = LockState(lockset=initial_lockset, path_conditions=())
         worklist.append((cfg.entry_block, initial_state))
 
         while worklist:
@@ -204,15 +218,8 @@ class LocksetAnalyzer:
                 # --- Fixpoint on LOCKSET only (finite lattice) ---
                 joined_lockset = prev_state.lockset & incoming_state.lockset
                 if joined_lockset == prev_state.lockset:
-                    # Lockset has not changed: fixpoint reached for this block.
-                    # Path conditions may differ across visits but do not affect
-                    # lockset correctness, so we stop propagating.
                     continue
 
-                # Lockset shrank: merge path conditions conservatively and re-propagate.
-                # We cap at MAX_PATH_CONDITIONS to bound memory; excess conditions are
-                # silently dropped (conservative: SMT may miss some prunings, never
-                # wrongly classify a useful lock as useless).
                 merged_conds = dict.fromkeys(
                     prev_state.path_conditions + incoming_state.path_conditions
                 )
@@ -230,7 +237,7 @@ class LocksetAnalyzer:
 
             for inst in block.instructions:
                 block_inst_states.append(current_state)
-                current_state = self._transfer_function(inst, current_state)
+                current_state = self._transfer_function(inst, current_state, summaries)
 
             instruction_states[block_name] = block_inst_states
 
@@ -241,10 +248,149 @@ class LocksetAnalyzer:
 
         return instruction_states
 
-    def _transfer_function(self, inst: LLVMInstruction, state: LockState) -> LockState:
+    def compute_all_summaries(self, cfgs: Dict[str, CFG], max_iterations: int = 5) -> Dict[str, FunctionLockSummary]:
+        """Computes lock effect summaries for all functions using a bottom-up fixpoint algorithm.
+
+        Args:
+            cfgs: Dictionary mapping function_name -> CFG.
+            max_iterations: Maximum iterations for mutual recursion convergence.
+
+        Returns:
+            Dictionary mapping function_name -> FunctionLockSummary.
+        """
+        summaries: Dict[str, FunctionLockSummary] = {
+            f: FunctionLockSummary() for f in cfgs
+        }
+
+        for _ in range(max_iterations):
+            changed = False
+            for func_name, cfg in cfgs.items():
+                summary = self._compute_single_function_summary(cfg, summaries)
+                if (summary.net_acquires != summaries[func_name].net_acquires or
+                        summary.net_releases != summaries[func_name].net_releases):
+                    summaries[func_name] = summary
+                    changed = True
+
+            if not changed:
+                break
+
+        self.function_summaries = summaries
+        return summaries
+
+    def _compute_single_function_summary(self, cfg: CFG,
+                                         current_summaries: Dict[str, FunctionLockSummary]) -> FunctionLockSummary:
+        """Analyzes a CFG starting from an empty lockset to calculate net acquired and released locks."""
+        instruction_states = self.analyze_cfg(cfg, initial_lockset=frozenset(), function_summaries=current_summaries)
+
+        return_locksets: List[FrozenSet[str]] = []
+        unpaired_releases: Set[str] = set()
+
+        for block in cfg.blocks.values():
+            for idx, inst in enumerate(block.instructions):
+                raw = inst.raw.strip()
+                if inst.opcode == "ret":
+                    if idx < len(instruction_states.get(block.name, [])):
+                        state = instruction_states[block.name][idx]
+                        return_locksets.append(state.lockset)
+
+                # Track unlock calls where the mutex was not currently held (net release)
+                if self._is_unlock_call(raw):
+                    mutex_arg = self._extract_mutex_arg(raw)
+                    if mutex_arg:
+                        canon_id = self.alias_resolver.get_canonical_id(mutex_arg)
+                        current_held = instruction_states[block.name][idx].lockset if idx < len(instruction_states.get(block.name, [])) else frozenset()
+                        if canon_id not in current_held:
+                            unpaired_releases.add(canon_id)
+
+        # Net acquires: locks held on ALL return paths
+        if return_locksets:
+            net_acquires = set(return_locksets[0])
+            for ls in return_locksets[1:]:
+                net_acquires &= ls
+        else:
+            net_acquires = set()
+
+        is_balanced = len(net_acquires) == 0 and len(unpaired_releases) == 0
+
+        return FunctionLockSummary(
+            net_acquires=net_acquires,
+            net_releases=unpaired_releases,
+            is_balanced=is_balanced,
+        )
+
+    def compute_interprocedural_entry_locksets(self, cfgs: Dict[str, CFG],
+                                               summaries: Optional[Dict[str, FunctionLockSummary]] = None) -> Dict[str, FrozenSet[str]]:
+        """Propagates held locksets from callers to callees (Top-Down phase).
+
+        Args:
+            cfgs: Dictionary mapping function_name -> CFG.
+            summaries: Precomputed function summaries.
+
+        Returns:
+            Dictionary mapping function_name -> FrozenSet of locks held across all call sites.
+        """
+        active_summaries = summaries or self.function_summaries
+        incoming_locksets: Dict[str, List[FrozenSet[str]]] = {f: [] for f in cfgs}
+
+        # Step 1: Collect caller lockset at every callsite
+        for caller_name, cfg in cfgs.items():
+            instruction_states = self.analyze_cfg(cfg, initial_lockset=frozenset(), function_summaries=active_summaries)
+
+            for block_name, block in cfg.blocks.items():
+                for idx, inst in enumerate(block.instructions):
+                    raw = inst.raw.strip()
+                    if "call " in raw or "invoke " in raw:
+                        call_match = CALL_TARGET_WITH_ARGS_PATTERN.search(raw)
+                        if call_match:
+                            callee_name = call_match.group(1)
+                            if callee_name in incoming_locksets:
+                                current_state = instruction_states[block_name][idx] if idx < len(instruction_states[block_name]) else None
+                                if current_state is not None:
+                                    incoming_locksets[callee_name].append(current_state.lockset)
+
+        # Step 2: Compute conservative intersection of held locksets across all call sites
+        entry_locksets: Dict[str, FrozenSet[str]] = {}
+        for func_name, lockset_list in incoming_locksets.items():
+            if lockset_list:
+                # If called from multiple places, intersect to be sound (must be held in all contexts)
+                intersected = set(lockset_list[0])
+                for ls in lockset_list[1:]:
+                    intersected &= ls
+                entry_locksets[func_name] = frozenset(intersected)
+            else:
+                entry_locksets[func_name] = frozenset()
+
+        self.function_entry_locksets = entry_locksets
+        return entry_locksets
+
+    def analyze_module(self, cfgs: Dict[str, CFG]) -> Dict[str, Dict[str, List[LockState]]]:
+        """Runs full 2-pass interprocedural analysis on all CFGs.
+
+        1. Bottom-Up pass: computes function summaries.
+        2. Top-Down pass: computes entry locksets.
+        3. Final pass: computes full instruction lockstates with inherited context.
+
+        Args:
+            cfgs: Dictionary mapping function_name -> CFG.
+
+        Returns:
+            Dictionary mapping function_name -> (block_name -> List of LockState).
+        """
+        summaries = self.compute_all_summaries(cfgs)
+        entry_locksets = self.compute_interprocedural_entry_locksets(cfgs, summaries)
+
+        all_states: Dict[str, Dict[str, List[LockState]]] = {}
+        for func_name, cfg in cfgs.items():
+            initial_lockset = entry_locksets.get(func_name, frozenset())
+            all_states[func_name] = self.analyze_cfg(cfg, initial_lockset=initial_lockset, function_summaries=summaries)
+
+        return all_states
+
+    def _transfer_function(self, inst: LLVMInstruction, state: LockState,
+                           summaries: Optional[Dict[str, FunctionLockSummary]] = None) -> LockState:
         raw = inst.raw.strip()
 
-        # Check for Lock Call
+        # Check for Direct Lock Call
         for lock_func in self.lock_funcs:
             if f"@{lock_func}" in raw and ("call " in raw or "invoke " in raw):
                 mutex_reg = self._extract_mutex_arg(raw)
@@ -253,7 +399,7 @@ class LocksetAnalyzer:
                     new_lockset = state.lockset | {canon_id}
                     return LockState(lockset=new_lockset, path_conditions=state.path_conditions)
 
-        # Check for Unlock Call
+        # Check for Direct Unlock Call
         for unlock_func in self.unlock_funcs:
             if f"@{unlock_func}" in raw and ("call " in raw or "invoke " in raw):
                 mutex_reg = self._extract_mutex_arg(raw)
@@ -265,7 +411,22 @@ class LocksetAnalyzer:
         # Check for Cond Wait Call (Net effect = 0 on lockset)
         for cond_func in self.cond_wait_funcs:
             if f"@{cond_func}" in raw and ("call " in raw or "invoke " in raw):
-                return state  # Lockset remains unchanged after cond_wait
+                return state
+
+        # Check for Function Calls with Precomputed Summaries (Wrappers / Helpers)
+        if summaries and ("call " in raw or "invoke " in raw):
+            call_match = CALL_TARGET_WITH_ARGS_PATTERN.search(raw)
+            if call_match:
+                callee_name = call_match.group(1)
+                if callee_name in summaries and not summaries[callee_name].is_balanced:
+                    summary = summaries[callee_name]
+                    # Map net acquires / releases
+                    new_lockset = set(state.lockset)
+                    for rel in summary.net_releases:
+                        new_lockset.discard(self.alias_resolver.get_canonical_id(rel))
+                    for acq in summary.net_acquires:
+                        new_lockset.add(self.alias_resolver.get_canonical_id(acq))
+                    return LockState(lockset=frozenset(new_lockset), path_conditions=state.path_conditions)
 
         # Check for Conditional Branch to collect path conditions
         cond_match = TERMINATOR_BR_COND.match(raw)
@@ -276,12 +437,20 @@ class LocksetAnalyzer:
 
         return state
 
+    def _is_unlock_call(self, raw_line: str) -> bool:
+        if "call " not in raw_line and "invoke " not in raw_line:
+            return False
+        for unlock_func in self.unlock_funcs:
+            if f"@{unlock_func}" in raw_line:
+                return True
+        return False
+
     def _extract_mutex_arg(self, raw_line: str) -> Optional[str]:
         match = MUTEX_ARG_PATTERN.search(raw_line)
         if match:
             return match.group(1)
-        # Fallback regex matching first % or @ operand inside parentheses
         fallback = re.search(r"\(\s*(?:[^\(\),]+\s+)?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)", raw_line)
         if fallback:
             return fallback.group(1)
         return None
+

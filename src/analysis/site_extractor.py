@@ -42,11 +42,14 @@ class SiteExtractor:
         # Step 1: Compute direct memory effects (reads, writes) for every function
         self._compute_function_memory_effects(cfgs)
 
+        # Step 2: Compute 2-pass interprocedural lockstates across all functions
+        module_lockstates = self.lockset_analyzer.analyze_module(cfgs)
+
         all_sites: List[LockSite] = []
         site_counter = 1
 
         for func_name, cfg in cfgs.items():
-            instruction_lockstates = self.lockset_analyzer.analyze_cfg(cfg)
+            instruction_lockstates = module_lockstates.get(func_name, {})
 
             for block_name, block in cfg.blocks.items():
                 for idx, inst in enumerate(block.instructions):
