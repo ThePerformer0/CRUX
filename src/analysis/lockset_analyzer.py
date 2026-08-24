@@ -32,8 +32,10 @@ LOCK_FUNCTIONS: Set[str] = {
     "mutex_lock", "mutex_lock_interruptible", "mutex_lock_killable", "mutex_trylock",
     "spin_lock", "spin_lock_irq", "spin_lock_irqsave", "spin_lock_bh", "spin_trylock",
     "raw_spin_lock", "raw_spin_lock_irq", "raw_spin_lock_irqsave",
+    "_raw_spin_lock", "_raw_spin_lock_irq", "_raw_spin_lock_irqsave", "_raw_spin_lock_bh", "_raw_spin_trylock",
     "down_read", "down_read_trylock", "down_write", "down_write_trylock",
     "read_lock", "read_lock_irqsave", "write_lock", "write_lock_irqsave",
+    "_raw_read_lock", "_raw_read_lock_irqsave", "_raw_write_lock", "_raw_write_lock_irqsave",
     # PostgreSQL
     "LWLockAcquire", "LWLockAcquireOrWait", "LWLockConditionalAcquire",
     "SpinLockAcquire", "s_lock",
@@ -91,8 +93,10 @@ UNLOCK_FUNCTIONS: Set[str] = {
     # Linux Kernel
     "mutex_unlock", "spin_unlock", "spin_unlock_irq", "spin_unlock_irqrestore", "spin_unlock_bh",
     "raw_spin_unlock", "raw_spin_unlock_irq", "raw_spin_unlock_irqrestore",
+    "_raw_spin_unlock", "_raw_spin_unlock_irq", "_raw_spin_unlock_irqrestore", "_raw_spin_unlock_bh",
     "up_read", "up_write",
     "read_unlock", "read_unlock_irqrestore", "write_unlock", "write_unlock_irqrestore",
+    "_raw_read_unlock", "_raw_read_unlock_irqrestore", "_raw_write_unlock", "_raw_write_unlock_irqrestore",
     # PostgreSQL
     "LWLockRelease", "LWLockReleaseClearParticipant",
     "SpinLockRelease", "s_unlock",
