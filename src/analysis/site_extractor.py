@@ -16,6 +16,9 @@ from src.analysis.lockset_analyzer import LocksetAnalyzer, LOCK_FUNCTIONS, UNLOC
 
 LOAD_VAR_PATTERN = re.compile(r"load\s+.*,\s*.*?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
 STORE_VAR_PATTERN = re.compile(r"store\s+.*,\s*.*?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
+ATOMIC_VAR_PATTERN = re.compile(r"(?:atomicrmw|cmpxchg)\s+.*?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
+MEMCPY_PATTERN = re.compile(r"@llvm\.mem(?:cpy|move)[a-zA-Z0-9_$.]*\s*\(\s*(?:ptr|i8\*|[a-zA-Z0-9_*]+)\s*(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)\s*,\s*(?:ptr|i8\*|[a-zA-Z0-9_*]+)\s*(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
+MEMSET_PATTERN = re.compile(r"@llvm\.memset[a-zA-Z0-9_$.]*\s*\(\s*(?:ptr|i8\*|[a-zA-Z0-9_*]+)\s*(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
 CALL_TARGET_PATTERN = re.compile(r"(?:call|invoke)\s+.*@([a-zA-Z0-9_$.]+)\s*\(")
 
 
@@ -120,6 +123,21 @@ class SiteExtractor:
                         m = STORE_VAR_PATTERN.search(raw)
                         if m:
                             writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
+                    elif inst.opcode in ("atomicrmw", "cmpxchg"):
+                        m = ATOMIC_VAR_PATTERN.search(raw)
+                        if m:
+                            canon = self.alias_resolver.get_canonical_id(m.group(1))
+                            reads.add(canon)
+                            writes.add(canon)
+                    elif "llvm.memcpy" in raw or "llvm.memmove" in raw:
+                        m = MEMCPY_PATTERN.search(raw)
+                        if m:
+                            writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
+                            reads.add(self.alias_resolver.get_canonical_id(m.group(2)))
+                    elif "llvm.memset" in raw:
+                        m = MEMSET_PATTERN.search(raw)
+                        if m:
+                            writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
 
             self.function_effects[func_name] = (reads, writes)
 
@@ -159,6 +177,25 @@ class SiteExtractor:
                 # Record direct writes
                 elif inst.opcode == "store":
                     m = STORE_VAR_PATTERN.search(raw)
+                    if m:
+                        site.writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
+
+                # Record atomics
+                elif inst.opcode in ("atomicrmw", "cmpxchg"):
+                    m = ATOMIC_VAR_PATTERN.search(raw)
+                    if m:
+                        canon = self.alias_resolver.get_canonical_id(m.group(1))
+                        site.reads.add(canon)
+                        site.writes.add(canon)
+
+                # Record memcpy/memset
+                elif "llvm.memcpy" in raw or "llvm.memmove" in raw:
+                    m = MEMCPY_PATTERN.search(raw)
+                    if m:
+                        site.writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
+                        site.reads.add(self.alias_resolver.get_canonical_id(m.group(2)))
+                elif "llvm.memset" in raw:
+                    m = MEMSET_PATTERN.search(raw)
                     if m:
                         site.writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
 

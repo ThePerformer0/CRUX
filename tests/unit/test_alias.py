@@ -97,3 +97,20 @@ def test_store_load_pointer_aliasing():
     resolver = AliasResolver()
     resolver.analyze_ir(ir)
     assert resolver.get_canonical_id("%dst") == resolver.get_canonical_id("%src")
+
+
+def test_select_aliasing():
+    """Verify select instruction merges destination register with both potential pointer operands."""
+    ir = """
+    define void @foo(ptr %p1, ptr %p2, i1 %c) {
+    entry:
+        %res = select i1 %c, ptr %p1, ptr %p2
+        ret void
+    }
+    """
+    resolver = AliasResolver()
+    resolver.analyze_ir(ir)
+    canon_res = resolver.get_canonical_id("%res")
+    assert canon_res == resolver.get_canonical_id("%p1")
+    assert canon_res == resolver.get_canonical_id("%p2")
+

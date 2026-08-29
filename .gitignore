@@ -37,3 +37,6 @@ ENV/
 # Cloned experiment repositories & protocol draft
 experiments/repos/
 experiments/commit_mining/protocole_validation_crux.md
+experiments/commit_mining/m01_memcached_results.json
+report.json
+

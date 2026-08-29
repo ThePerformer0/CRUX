@@ -169,6 +169,14 @@ def _compute_cfg_edges(cfg: CFG) -> None:
                     block.successors.append(target)
             continue
 
+        # 5. Indirect branch: indirectbr ptr %addr, [ label %b1, label %b2 ]
+        if last_inst.opcode == "indirectbr":
+            targets = TERMINATOR_SWITCH.findall(raw_last)
+            for target in targets:
+                if target not in block.successors:
+                    block.successors.append(target)
+            continue
+
     # Filter successors to only include valid blocks defined in cfg.blocks
     for block in cfg.blocks.values():
         block.successors = [s for s in block.successors if s in cfg.blocks]

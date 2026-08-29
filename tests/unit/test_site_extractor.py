@@ -152,3 +152,42 @@ def test_lockset_at_entry_extraction():
     assert site1.lockset_at_entry == frozenset()
     assert site2.mutex_canonical_id == "%m2"
     assert site2.lockset_at_entry == frozenset(["%m1"])
+
+
+def test_atomic_and_memcpy_effects():
+    """Verify atomicrmw, cmpxchg, llvm.memcpy, and llvm.memset memory effects in critical section."""
+    ir = """
+    @atomic_cnt = global i32 0, align 4
+    @src_buf = global [16 x i8] zeroinitializer, align 1
+    @dst_buf = global [16 x i8] zeroinitializer, align 1
+
+    define void @foo(i8* %m, ptr %ptr) {
+    entry:
+        call i32 @pthread_mutex_lock(i8* %m)
+        %old = atomicrmw add ptr @atomic_cnt, i32 1 seq_cst
+        call void @llvm.memcpy.p0.p0.i64(ptr @dst_buf, ptr @src_buf, i64 16, i1 false)
+        call void @llvm.memset.p0.i64(ptr %ptr, i8 0, i64 8, i1 false)
+        call i32 @pthread_mutex_unlock(i8* %m)
+        ret void
+    }
+    """
+    cfgs = build_cfgs(ir)
+    cg = build_call_graph(ir)
+    resolver = AliasResolver()
+    resolver.analyze_cfgs(cfgs)
+    lockset_analyzer = LocksetAnalyzer(resolver)
+
+    extractor = SiteExtractor(resolver, cg, lockset_analyzer)
+    sites = extractor.extract_sites(cfgs)
+
+    assert len(sites) == 1
+    site = sites[0]
+    # atomicrmw writes and reads
+    assert "@atomic_cnt" in site.reads
+    assert "@atomic_cnt" in site.writes
+    # memcpy reads src, writes dst
+    assert "@src_buf" in site.reads
+    assert "@dst_buf" in site.writes
+    # memset writes ptr
+    assert "%ptr" in site.writes
+

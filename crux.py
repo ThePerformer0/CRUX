@@ -101,8 +101,25 @@ def main() -> None:
 
     if args.verbose:
         summary = report["summary"]
-        print(f"[CRUX SUMMARY] Total sites: {summary['total_sites']} | Useless: {summary['useless_sites']} | Useful: {summary['useful_sites']}")
+        print("\n" + "=" * 70)
+        print(f"  CRUX Analysis Summary -- {args.llvm_ir_file}")
+        print("=" * 70)
+        print(f"  Total Lock Sites    : {summary['total_sites']}")
+        print(f"  Useless Sites (Safe): {summary['useless_sites']}")
+        print(f"  Useful Sites (Kept) : {summary['useful_sites']}")
+        print(f"  Analysis Time       : {report['metadata']['analysis_time_seconds']}s")
+        print("-" * 70)
+        if report["useless_sites"]:
+            print("  Detected Useless Locks:")
+            for s in report["useless_sites"]:
+                reasons_str = ", ".join(s["reasons"])
+                print(f"    * [{s['id']}] {s['function']}(): line {s['lock_source_line']} -> {reasons_str} (mutex: {s['mutex_name']})")
+        else:
+            print("  No useless lock sites detected (all locks are necessary).")
+        print("=" * 70 + "\n")
+
 
 
 if __name__ == "__main__":
     main()
+

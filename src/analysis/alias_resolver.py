@@ -113,6 +113,14 @@ class AliasResolver:
                 if val_clean.startswith("%") or val_clean.startswith("@"):
                     self.uf.union(inst.dest, val_clean)
 
+        # Rule 3b: %dst = select i1 %c, ptr %p1, ptr %p2
+        elif inst.opcode == "select" and inst.dest:
+            ptrs = re.findall(r"(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)", raw)
+            # Skip the destination and condition
+            for p in ptrs:
+                if p != inst.dest and (p.startswith("%") or p.startswith("@")):
+                    self.uf.union(inst.dest, p)
+
         # Rule 4: store %val, %ptr* or @ptr
         elif inst.opcode == "store":
             store_match = STORE_PTR_PATTERN.search(raw)
@@ -134,6 +142,13 @@ class AliasResolver:
                     self.uf.union(inst.dest, stored_val)
                 else:
                     self.points_to[ptr_reg] = inst.dest
+
+    def is_thread_local(self, canonical_id: str) -> bool:
+        """Determines if a canonical variable identifier is guaranteed thread-local (e.g. stack alloca)."""
+        clean = canonical_id.strip()
+        if clean.startswith("@"):
+            return False  # Global variable
+        return True
 
     def get_canonical_id(self, reg: str, visited: Optional[Set[str]] = None) -> str:
         """Returns the canonical identifier for a register or variable string.

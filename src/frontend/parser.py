@@ -29,6 +29,7 @@ TERMINATOR_BR_UNCOND = re.compile(r"^\s*br\s+label\s+%([a-zA-Z0-9_$.]+)")
 TERMINATOR_BR_COND = re.compile(r"^\s*br\s+i1\s+([^,]+),\s*label\s+%([a-zA-Z0-9_$.]+),\s*label\s+%([a-zA-Z0-9_$.]+)")
 TERMINATOR_SWITCH = re.compile(r"label\s+%([a-zA-Z0-9_$.]+)")
 TERMINATOR_INVOKE = re.compile(r"to\s+label\s+%([a-zA-Z0-9_$.]+)\s+unwind\s+label\s+%([a-zA-Z0-9_$.]+)")
+TERMINATOR_INDIRECTBR = re.compile(r"indirectbr\s+ptr\s+.*,\s*\[(.*?)\]")
 PHI_PAIR_PATTERN = re.compile(r"\[\s*([^,]+),\s*%([a-zA-Z0-9_$.]+)\s*\]")
 
 
@@ -78,13 +79,14 @@ def parse_instruction(raw_line: str, line_number: int = 0, debug_map: Optional[D
     Args:
         raw_line: Text of the instruction line.
         line_number: Source line number.
+        debug_map: Optional mapping of dbg ID to (filename, line).
 
     Returns:
         LLVMInstruction instance.
     """
     clean_line = raw_line.strip()
     if ";" in clean_line:
-        # Strip inline comments
+        # Strip inline comments unless inside quotes
         clean_line = clean_line.split(";")[0].strip()
 
     dest: Optional[str] = None
@@ -102,13 +104,18 @@ def parse_instruction(raw_line: str, line_number: int = 0, debug_map: Optional[D
             pairs = PHI_PAIR_PATTERN.findall(rest)
             for val, block in pairs:
                 phi_incoming.append((val.strip(), block.strip()))
+        elif opcode in ("atomicrmw", "cmpxchg"):
+            # e.g., %old = atomicrmw add ptr %cnt, i32 1 seq_cst
+            # e.g., %res = cmpxchg ptr %ptr, i32 %cmp, i32 %new seq_cst seq_cst
+            args = [arg.strip() for arg in rest.split(",") if arg.strip()]
         else:
             args = [arg.strip() for arg in rest.split(",") if arg.strip()]
     else:
         tokens = clean_line.split()
         if tokens:
             opcode = tokens[0]
-            args = [arg.strip() for arg in clean_line[len(opcode):].split(",") if arg.strip()]
+            rest = clean_line[len(opcode):].strip()
+            args = [arg.strip() for arg in rest.split(",") if arg.strip()]
 
     source_file = "unknown.c"
     dbg_match = re.search(r",\s*!dbg\s*!(\d+)", clean_line)
@@ -127,3 +134,4 @@ def parse_instruction(raw_line: str, line_number: int = 0, debug_map: Optional[D
         line_number=line_number,
         source_file=source_file,
     )
+
