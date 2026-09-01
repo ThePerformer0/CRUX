@@ -183,3 +183,41 @@ def test_true_lock_nesting_is_detected():
     
     assert "REDUNDANT" in inner_site.reasons
     assert inner_site.is_useless
+
+
+def test_barrier_lock_guard_prevents_false_empty_cs():
+    """Verify that an empty CS lock(); unlock(); on an asymmetric/barrier mutex is not flagged as EMPTY_CS."""
+    call_graph = CallGraph()
+    lsg = LockSiteGraph(call_graph)
+
+    # Site 1: pause_threads acquires @hang_lock with no intra-procedural unlock (escaping lock)
+    barrier_holder_site = LockSite(
+        site_id="s_pause",
+        mutex_canonical_id="@hang_lock",
+        mutex_name="@hang_lock",
+        function="pause_threads",
+        lock_source_line=100,
+        unlock_source_lines=[],  # No matching unlock in this function -> escaping lock
+    )
+
+    # Site 2: worker thread does lock(@hang_lock); unlock(@hang_lock); to wait for pause to end (empty CS)
+    worker_wait_site = LockSite(
+        site_id="s_worker",
+        mutex_canonical_id="@hang_lock",
+        mutex_name="@hang_lock",
+        function="worker_process",
+        lock_source_line=200,
+        unlock_source_lines=[201],
+        reads=set(),
+        writes=set(),
+        calls=[],
+    )
+
+    lsg.build_graph([barrier_holder_site, worker_wait_site])
+    classifier = Classifier(lsg)
+    classifier.classify_all()
+
+    # The worker site has empty CS, but because @hang_lock is an escaping barrier lock, Guard 5 suppresses EMPTY_CS!
+    assert "EMPTY_CS" not in worker_wait_site.reasons
+    assert not worker_wait_site.is_useless
+

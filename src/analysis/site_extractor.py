@@ -106,6 +106,13 @@ class SiteExtractor:
                 return True
         return False
 
+    def _canonicalize_var(self, raw_var: str, func_name: str) -> str:
+        """Returns canonical ID, prefixing local registers with function name for sound scoping."""
+        canon = self.alias_resolver.get_canonical_id(raw_var)
+        if canon.startswith("@"):
+            return canon
+        return f"{func_name}::{canon}"
+
     def _compute_function_memory_effects(self, cfgs: Dict[str, CFG]) -> None:
         """Precomputes direct memory reads and writes for every function."""
         for func_name, cfg in cfgs.items():
@@ -190,11 +197,13 @@ class SiteExtractor:
 
                 # Record memcpy/memset
                 elif "llvm.memcpy" in raw or "llvm.memmove" in raw:
+                    site.has_memory_intrinsic = True
                     m = MEMCPY_PATTERN.search(raw)
                     if m:
                         site.writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
                         site.reads.add(self.alias_resolver.get_canonical_id(m.group(2)))
                 elif "llvm.memset" in raw:
+                    site.has_memory_intrinsic = True
                     m = MEMSET_PATTERN.search(raw)
                     if m:
                         site.writes.add(self.alias_resolver.get_canonical_id(m.group(1)))

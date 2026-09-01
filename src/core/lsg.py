@@ -60,9 +60,10 @@ class LockSiteGraph:
         for site in sites_list:
             all_vars = site.reads | site.writes | site.transitive_reads | site.transitive_writes
             for v in all_vars:
-                if v not in var_to_sites:
-                    var_to_sites[v] = set()
-                var_to_sites[v].add(site.site_id)
+                scoped_v = v if v.startswith("@") else f"{site.function}::{v}"
+                if scoped_v not in var_to_sites:
+                    var_to_sites[scoped_v] = set()
+                var_to_sites[scoped_v].add(site.site_id)
 
         added_edges = set()
         for site in sites_list:
@@ -70,7 +71,8 @@ class LockSiteGraph:
             if not writes:
                 continue
             for w_var in writes:
-                for other_site_id in var_to_sites.get(w_var, ()):
+                scoped_w = w_var if w_var.startswith("@") else f"{site.function}::{w_var}"
+                for other_site_id in var_to_sites.get(scoped_w, ()):
                     if other_site_id != site.site_id:
                         edge_key = (site.site_id, other_site_id)
                         if edge_key not in added_edges:
@@ -134,6 +136,26 @@ class LockSiteGraph:
             if data.get("kind") == EdgeKind.NEST:
                 return self.sites_by_id.get(u)
         return None
+
+    def get_share_neighbors(self, site_id: str) -> Set[str]:
+        """Returns the set of neighbor site IDs connected via SHARE edges."""
+        if site_id not in self.graph:
+            return set()
+        neighbors: Set[str] = set()
+        for u, v, data in self.graph.edges(site_id, data=True):
+            if data.get("kind") == EdgeKind.SHARE:
+                neighbors.add(v)
+        return neighbors
+
+    def get_nest_children(self, parent_site_id: str) -> Set[str]:
+        """Returns the set of child site IDs nested under parent_site_id via outgoing NEST edges."""
+        if parent_site_id not in self.graph:
+            return set()
+        children: Set[str] = set()
+        for u, v, data in self.graph.out_edges(parent_site_id, data=True):
+            if data.get("kind") == EdgeKind.NEST:
+                children.add(v)
+        return children
 
     def all_share_edges_have_hb(self, site_id: str) -> bool:
         """Returns True if all SHARE edges connected to site_id are ordered by a HB edge."""

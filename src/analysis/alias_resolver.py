@@ -56,6 +56,7 @@ class AliasResolver:
         self.uf = UnionFind()
         self.gep_map: Dict[str, Tuple[str, str]] = {}  # reg -> (base_reg, field_index)
         self.points_to: Dict[str, str] = {}  # ptr_reg -> stored_val_reg
+        self.stack_allocas: Set[str] = set()  # set of registers allocated on the stack (alloca)
 
     def analyze_cfgs(self, cfgs: Dict[str, CFG]) -> None:
         """Analyzes all instructions across CFGs to populate alias equivalence classes.
@@ -76,8 +77,12 @@ class AliasResolver:
     def _process_instruction(self, inst: LLVMInstruction) -> None:
         raw = inst.raw.strip()
 
+        # Rule 0: %dst = alloca ...
+        if inst.opcode == "alloca" and inst.dest:
+            self.stack_allocas.add(inst.dest)
+
         # Rule 1: %dst = bitcast T* %src to U*
-        if inst.opcode == "bitcast" and inst.dest:
+        elif inst.opcode == "bitcast" and inst.dest:
             src_match = BITCAST_PATTERN.search(raw)
             if src_match:
                 src_reg = src_match.group(1)
@@ -142,6 +147,18 @@ class AliasResolver:
                     self.uf.union(inst.dest, stored_val)
                 else:
                     self.points_to[ptr_reg] = inst.dest
+
+    def is_stack_alloca(self, var_name: str) -> bool:
+        """Determines if a variable identifier or its base pointer originates from a stack alloca."""
+        clean = var_name.strip()
+        if clean.startswith("@"):
+            return False
+        # Strip struct field offset if present: e.g. "%var.1.2" -> "%var"
+        base_part = clean.split(".")[0] if "." in clean else clean
+        root = self.uf.find(base_part)
+        if root in self.stack_allocas or base_part in self.stack_allocas:
+            return True
+        return clean.startswith("%") and not clean.startswith("@")
 
     def is_thread_local(self, canonical_id: str) -> bool:
         """Determines if a canonical variable identifier is guaranteed thread-local (e.g. stack alloca)."""

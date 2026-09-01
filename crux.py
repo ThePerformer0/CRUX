@@ -75,7 +75,7 @@ def main() -> None:
     lsg.build_graph(sites)
 
     # Pipeline Phase 7: Classifier
-    classifier = Classifier(lsg)
+    classifier = Classifier(lsg, alias_resolver)
     classifier.classify_all()
 
     # Pipeline Phase 8: SMT Validator
