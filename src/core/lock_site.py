@@ -32,6 +32,7 @@ class LockSite:
     transitive_writes: Set[str] = field(default_factory=set)
     has_indirect_calls: bool = False
     has_memory_intrinsic: bool = False
+    has_inline_asm: bool = False
 
     # SMT Validation
     path_conditions: List[str] = field(default_factory=list)

@@ -112,3 +112,31 @@ def test_safety_guard_cond_wait():
     assert "EMPTY_CS" not in reasons
     assert "READ_ONLY" not in reasons
     assert site.is_useless is False
+
+
+def test_classifier_guards_inline_asm():
+    """Verify inline assembly or memory intrinsic guards discard EMPTY_CS and LOCAL_VARS reasons."""
+    # Site 1: Looks empty but has inline asm
+    site_asm = LockSite(site_id="s1", mutex_canonical_id="%m", mutex_name="%m", function="foo",
+                        has_inline_asm=True)
+    
+    # Site 2: Looks like LOCAL_VARS but has a memory fence
+    site_fence = LockSite(site_id="s2", mutex_canonical_id="%m", mutex_name="%m", function="bar",
+                          reads={"%local_x"}, writes={"%local_y"}, has_memory_intrinsic=True)
+    
+    lsg = LockSiteGraph()
+    lsg.build_graph([site_asm, site_fence])
+
+    classifier = Classifier(lsg)
+    
+    # Simulate stack-local validation for site_fence
+    classifier.alias_resolver = type('MockResolver', (), {'is_stack_alloca': lambda self, v: True})()
+
+    reasons_asm = classifier.classify_site(site_asm)
+    reasons_fence = classifier.classify_site(site_fence)
+
+    assert "EMPTY_CS" not in reasons_asm
+    assert site_asm.is_useless is False
+    
+    assert "LOCAL_VARS" not in reasons_fence
+    assert site_fence.is_useless is False

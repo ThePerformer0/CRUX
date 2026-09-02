@@ -208,18 +208,25 @@ class SiteExtractor:
                     if m:
                         site.writes.add(self.alias_resolver.get_canonical_id(m.group(1)))
 
+                # Record fence (memory barriers)
+                elif inst.opcode == "fence":
+                    site.has_memory_intrinsic = True
+
                 # Record calls
                 elif "call " in raw or "invoke " in raw:
-                    call_match = CALL_TARGET_PATTERN.search(raw)
-                    if call_match:
-                        callee = call_match.group(1)
-                        if not callee.startswith("llvm.") and callee not in self.lockset_analyzer.lock_funcs and callee not in self.lockset_analyzer.unlock_funcs:
-                            if callee in COND_WAIT_FUNCTIONS:
-                                site.is_cond_wait_mutex = True
-                            else:
-                                site.calls.append(callee)
-                    elif "%" in raw:
-                        site.has_indirect_calls = True
+                    if " asm " in raw:
+                        site.has_inline_asm = True
+                    else:
+                        call_match = CALL_TARGET_PATTERN.search(raw)
+                        if call_match:
+                            callee = call_match.group(1)
+                            if not callee.startswith("llvm.") and callee not in self.lockset_analyzer.lock_funcs and callee not in self.lockset_analyzer.unlock_funcs:
+                                if callee in COND_WAIT_FUNCTIONS:
+                                    site.is_cond_wait_mutex = True
+                                else:
+                                    site.calls.append(callee)
+                        elif "%" in raw:
+                            site.has_indirect_calls = True
 
             if not stopped_by_unlock and block_name not in visited_blocks:
                 visited_blocks.add(block_name)

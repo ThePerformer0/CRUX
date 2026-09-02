@@ -191,3 +191,32 @@ def test_atomic_and_memcpy_effects():
     # memset writes ptr
     assert "%ptr" in site.writes
 
+
+def test_inline_asm_and_fence_effects():
+    """Verify inline assembly and fence (RCU memory barriers) are extracted as hardware effects."""
+    ir = """
+    define void @foo(i8* %m) {
+    entry:
+        call i32 @pthread_mutex_lock(i8* %m)
+        call void asm sideeffect "outb %al, %w1", "{ax},N{dirflag},..."()
+        fence seq_cst
+        call i32 @pthread_mutex_unlock(i8* %m)
+        ret void
+    }
+    """
+    cfgs = build_cfgs(ir)
+    cg = build_call_graph(ir)
+    resolver = AliasResolver()
+    resolver.analyze_cfgs(cfgs)
+    lockset_analyzer = LocksetAnalyzer(resolver)
+
+    extractor = SiteExtractor(resolver, cg, lockset_analyzer)
+    sites = extractor.extract_sites(cfgs)
+
+    assert len(sites) == 1
+    site = sites[0]
+    # Check that inline asm flagged the site
+    assert site.has_inline_asm is True
+    # Check that fence flagged the site
+    assert site.has_memory_intrinsic is True
+

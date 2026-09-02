@@ -79,13 +79,16 @@ class Classifier:
         # AND no calls to standard C memory-writing functions (memset, memcpy, etc.)
         # AND no detected LLVM memory intrinsics (even if variable extraction failed).
         if (not all_vars and not site.calls and not site.has_indirect_calls
-                and not has_mem_write_call and not site.has_memory_intrinsic):
+                and not has_mem_write_call and not site.has_memory_intrinsic
+                and not site.has_inline_asm):
             reasons.append("EMPTY_CS")
 
         # Pattern 2: LOCAL_VARS
         # Only flag if every accessed variable traces back to a true alloca (stack var).
         # GEP-derived pointers from parameters or globals are NOT local.
-        elif all_vars and all(self._is_stack_local(v) for v in all_vars) and not site.has_indirect_calls and not effective_conflict:
+        elif (all_vars and all(self._is_stack_local(v) for v in all_vars) 
+              and not site.has_indirect_calls and not effective_conflict
+              and not site.has_inline_asm and not site.has_memory_intrinsic):
             reasons.append("LOCAL_VARS")
 
         # Pattern 3: READ_ONLY
