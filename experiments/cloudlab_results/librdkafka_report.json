@@ -1,0 +1,2538 @@
+{
+  "metadata": {
+    "tool": "crux",
+    "version": "3.0",
+    "llvm_ir_file": "/users/Jim0/repos/librdkafka/librdkafka.ll",
+    "analysis_time_seconds": 182.15,
+    "alias_analysis": "field-based",
+    "interprocedural": true,
+    "smt_enabled": true
+  },
+  "summary": {
+    "total_sites": 3042,
+    "useless_sites": 186,
+    "useful_sites": 2856,
+    "edges": {
+      "share": 2701962,
+      "nest": 1584,
+      "hb": 0
+    }
+  },
+  "useless_sites": [
+    {
+      "id": "s12",
+      "mutex_name": "%8",
+      "function": "rd_kafka_fatal_error",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 872,
+      "unlock_source_lines": [
+        874
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s14",
+      "mutex_name": "%6",
+      "function": "rd_kafka_get_fatal_error",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 984,
+      "unlock_source_lines": [
+        986
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s24",
+      "mutex_name": "%48",
+      "function": "rd_kafka_destroy_app",
+      "source_file": "./rdkafka_int.h",
+      "lock_source_line": 1054,
+      "unlock_source_lines": [
+        1057
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s25",
+      "mutex_name": "%129",
+      "function": "rd_kafka_destroy_app",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 1255,
+      "unlock_source_lines": [
+        1258
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s31",
+      "mutex_name": "%32",
+      "function": "rd_kafka_consumer_close_q",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 984,
+      "unlock_source_lines": [
+        986
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s32",
+      "mutex_name": "%61",
+      "function": "rd_kafka_consumer_close_q",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s38",
+      "mutex_name": "%2",
+      "function": "rd_kafka_reset_any_broker_down_reported",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 2223,
+      "unlock_source_lines": [
+        2228,
+        2228
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s47",
+      "mutex_name": "%2",
+      "function": "rd_kafka_q_keep",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s49",
+      "mutex_name": "%54",
+      "function": "rd_kafka_thread_main",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 2422,
+      "unlock_source_lines": [
+        2425
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s50",
+      "mutex_name": "%201",
+      "function": "rd_kafka_thread_main",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s52",
+      "mutex_name": "%13",
+      "function": "rd_kafka_init_wait",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 2349,
+      "unlock_source_lines": [
+        2355,
+        2355
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s66",
+      "mutex_name": "%35",
+      "function": "rd_kafka_share_select_broker",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 3338,
+      "unlock_source_lines": [
+        3342,
+        3342
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s67",
+      "mutex_name": "%48",
+      "function": "rd_kafka_share_enqueue_fetch_op",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s68",
+      "mutex_name": "%29",
+      "function": "rd_kafka_share_enqueue_sync_ack_op",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s69",
+      "mutex_name": "%7",
+      "function": "rd_kafka_stats_emit_avg",
+      "source_file": "./rdavg.h",
+      "lock_source_line": 142,
+      "unlock_source_lines": [
+        146,
+        219,
+        219,
+        219
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s76",
+      "mutex_name": "%144",
+      "function": "rd_kafka_share_poll",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s105",
+      "mutex_name": "%7",
+      "function": "rd_kafka_consume_batch",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 4889,
+      "unlock_source_lines": [
+        4893,
+        4893
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s106",
+      "mutex_name": "%7",
+      "function": "rd_kafka_consume_callback",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 4990,
+      "unlock_source_lines": [
+        4994,
+        4994
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s107",
+      "mutex_name": "%46",
+      "function": "rd_kafka_app_poll_start",
+      "source_file": "./rdavg.h",
+      "lock_source_line": 78,
+      "unlock_source_lines": [
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s108",
+      "mutex_name": "%5",
+      "function": "rd_kafka_consume",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 5094,
+      "unlock_source_lines": [
+        5098,
+        5098
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s112",
+      "mutex_name": "%22",
+      "function": "rd_kafka_position",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 5460,
+      "unlock_source_lines": [
+        5463
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s118",
+      "mutex_name": "%9",
+      "function": "rd_kafka_get_watermark_offsets",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 5661,
+      "unlock_source_lines": [
+        5664
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s123",
+      "mutex_name": "%20",
+      "function": "rd_kafka_clusterid",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 6331,
+      "unlock_source_lines": [
+        0,
+        6336
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s124",
+      "mutex_name": "%20",
+      "function": "rd_kafka_clusterid",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 6331,
+      "unlock_source_lines": [
+        0,
+        6336
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s125",
+      "mutex_name": "%21",
+      "function": "rd_kafka_controllerid",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 6376,
+      "unlock_source_lines": [
+        6380,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s126",
+      "mutex_name": "%21",
+      "function": "rd_kafka_controllerid",
+      "source_file": "rdkafka.c",
+      "lock_source_line": 6376,
+      "unlock_source_lines": [
+        0,
+        6380
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s127",
+      "mutex_name": "%6",
+      "function": "rd_kafka_outq_len",
+      "source_file": "./rdkafka_int.h",
+      "lock_source_line": 1065,
+      "unlock_source_lines": [
+        1067
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s128",
+      "mutex_name": "%32",
+      "function": "rd_kafka_flush",
+      "source_file": "./rdkafka_int.h",
+      "lock_source_line": 1085,
+      "unlock_source_lines": [
+        1092,
+        1092
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s129",
+      "mutex_name": "%61",
+      "function": "rd_kafka_flush",
+      "source_file": "./rdkafka_int.h",
+      "lock_source_line": 1065,
+      "unlock_source_lines": [
+        1067
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s144",
+      "mutex_name": "%4",
+      "function": "rd_kafka_replyq_make",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s177",
+      "mutex_name": "%6",
+      "function": "rd_kafka_broker_ApiVersion_supported",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 306,
+      "unlock_source_lines": [
+        313,
+        324,
+        324,
+        324
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s178",
+      "mutex_name": "%4",
+      "function": "rd_kafka_broker_ApiVersion_at_least",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 306,
+      "unlock_source_lines": [
+        313,
+        324,
+        324,
+        324
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s194",
+      "mutex_name": "%125",
+      "function": "rd_kafka_broker_destroy_final",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s196",
+      "mutex_name": "%274",
+      "function": "rd_kafka_broker_destroy_final",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 5256,
+      "unlock_source_lines": [
+        5259
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s198",
+      "mutex_name": "%2",
+      "function": "rd_kafka_brokers_get_state_version",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 1381,
+      "unlock_source_lines": [
+        1383
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s199",
+      "mutex_name": "%4",
+      "function": "rd_kafka_brokers_wait_state_change",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 1409,
+      "unlock_source_lines": [
+        1416,
+        1416
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s215",
+      "mutex_name": "%23",
+      "function": "rd_kafka_broker_find_by_nodeid0_fl",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 5695,
+      "unlock_source_lines": [
+        5697
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s271",
+      "mutex_name": "%36",
+      "function": "rd_kafka_dr_implicit_ack",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 3173,
+      "unlock_source_lines": [
+        3173
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s272",
+      "mutex_name": "%2",
+      "function": "rd_kafka_broker_internal",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 5279,
+      "unlock_source_lines": [
+        5283,
+        5283
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s276",
+      "mutex_name": "%115",
+      "function": "rd_kafka_broker_add",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 5526,
+      "unlock_source_lines": [
+        5526
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s279",
+      "mutex_name": "%28",
+      "function": "rd_kafka_broker_thread_main",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 4914,
+      "unlock_source_lines": [
+        4915
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s311",
+      "mutex_name": "%24",
+      "function": "rd_kafka_broker_bufq_timeout_scan",
+      "source_file": "./rdkafka_broker.h",
+      "lock_source_line": 515,
+      "unlock_source_lines": [
+        517
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s312",
+      "mutex_name": "%24",
+      "function": "rd_kafka_broker_bufq_timeout_scan",
+      "source_file": "./rdkafka_broker.h",
+      "lock_source_line": 515,
+      "unlock_source_lines": [
+        517
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s356",
+      "mutex_name": "%60",
+      "function": "rd_kafka_broker_active_toppar_add",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 6353,
+      "unlock_source_lines": [
+        6353
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s369",
+      "mutex_name": "%11",
+      "function": "rd_kafka_broker_monitor_add",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s370",
+      "mutex_name": "%20",
+      "function": "rd_kafka_broker_monitor_add",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 6518,
+      "unlock_source_lines": [
+        6520
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s374",
+      "mutex_name": "%45",
+      "function": "rd_kafka_broker_set_nodename",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 5640,
+      "unlock_source_lines": [
+        5640
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s375",
+      "mutex_name": "%95",
+      "function": "rd_kafka_broker_set_nodename",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 3207,
+      "unlock_source_lines": [
+        3211
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s376",
+      "mutex_name": "%137",
+      "function": "rd_kafka_broker_set_nodename",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 3207,
+      "unlock_source_lines": [
+        3211
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s379",
+      "mutex_name": "%40",
+      "function": "rd_kafka_find_or_add_broker",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 5730,
+      "unlock_source_lines": [
+        5737,
+        5734,
+        5737
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s380",
+      "mutex_name": "%3",
+      "function": "rd_kafka_brokers_add",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 5974,
+      "unlock_source_lines": [
+        5976
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s383",
+      "mutex_name": "%16",
+      "function": "rd_kafka_broker_wakeup",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 6089,
+      "unlock_source_lines": [
+        6089
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s385",
+      "mutex_name": "%14",
+      "function": "rd_kafka_all_brokers_wakeup",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 6110,
+      "unlock_source_lines": [
+        6112
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s386",
+      "mutex_name": "%3",
+      "function": "rd_kafka_brokers_learned_ids",
+      "source_file": "rdkafka_broker.c",
+      "lock_source_line": 6596,
+      "unlock_source_lines": [
+        6603,
+        6603
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s393",
+      "mutex_name": "%2",
+      "function": "rd_kafka_txn_add_partition",
+      "source_file": "./rdkafka_txnmgr.h",
+      "lock_source_line": 100,
+      "unlock_source_lines": [
+        111,
+        105
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s394",
+      "mutex_name": "%17",
+      "function": "rd_kafka_txn_add_partition",
+      "source_file": "./rdkafka_txnmgr.h",
+      "lock_source_line": 115,
+      "unlock_source_lines": [
+        124,
+        124,
+        124
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s400",
+      "mutex_name": "%5",
+      "function": "rd_kafka_topic_find0_fl",
+      "source_file": "rdkafka_topic.c",
+      "lock_source_line": 180,
+      "unlock_source_lines": [
+        187,
+        187,
+        187
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s411",
+      "mutex_name": "%8",
+      "function": "rd_kafka_toppar_delegate_to_leader",
+      "source_file": "rdkafka_topic.c",
+      "lock_source_line": 989,
+      "unlock_source_lines": [
+        993
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s424",
+      "mutex_name": "%168",
+      "function": "rd_kafka_topic_scan_all",
+      "source_file": "rdkafka_topic.c",
+      "lock_source_line": 1976,
+      "unlock_source_lines": [
+        2006,
+        2006
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s428",
+      "mutex_name": "%3",
+      "function": "rd_kafka_local_topic_ids_to_list",
+      "source_file": "rdkafka_topic.c",
+      "lock_source_line": 2334,
+      "unlock_source_lines": [
+        2349,
+        2349
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s431",
+      "mutex_name": "%3",
+      "function": "rd_kafka_timer_is_started",
+      "source_file": "rdkafka_timer.c",
+      "lock_source_line": 38,
+      "unlock_source_lines": [
+        42
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s439",
+      "mutex_name": "%2",
+      "function": "rd_kafka_timers_interrupt",
+      "source_file": "rdkafka_timer.c",
+      "lock_source_line": 38,
+      "unlock_source_lines": [
+        42
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s444",
+      "mutex_name": "%2",
+      "function": "rd_kafka_timers_destroy",
+      "source_file": "rdkafka_timer.c",
+      "lock_source_line": 38,
+      "unlock_source_lines": [
+        42,
+        42
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s457",
+      "mutex_name": "%31",
+      "function": "rd_kafka_offset_store_message",
+      "source_file": "./rdkafka_offset.h",
+      "lock_source_line": 97,
+      "unlock_source_lines": [
+        118,
+        118,
+        118
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s461",
+      "mutex_name": "%4",
+      "function": "rd_kafka_replyq_make.1767",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s464",
+      "mutex_name": "%62",
+      "function": "rd_kafka_toppar_handle_OffsetForLeaderEpoch",
+      "source_file": "rdkafka_offset.c",
+      "lock_source_line": 967,
+      "unlock_source_lines": [
+        967
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s466",
+      "mutex_name": "%202",
+      "function": "rd_kafka_toppar_handle_OffsetForLeaderEpoch",
+      "source_file": "rdkafka_offset.c",
+      "lock_source_line": 1076,
+      "unlock_source_lines": [
+        1076
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s468",
+      "mutex_name": "%314",
+      "function": "rd_kafka_offset_commit",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s506",
+      "mutex_name": "%2",
+      "function": "rd_kafka_q_consumer_propagate",
+      "source_file": "rdkafka_queue.c",
+      "lock_source_line": 142,
+      "unlock_source_lines": [
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s516",
+      "mutex_name": "%41",
+      "function": "rd_kafka_app_poll_start.2107",
+      "source_file": "./rdavg.h",
+      "lock_source_line": 78,
+      "unlock_source_lines": [
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s533",
+      "mutex_name": "%9",
+      "function": "rd_kafka_queue_new0",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s536",
+      "mutex_name": "%10",
+      "function": "rd_kafka_queue_get_main",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s537",
+      "mutex_name": "%14",
+      "function": "rd_kafka_queue_get_consumer",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s538",
+      "mutex_name": "%19",
+      "function": "rd_kafka_queue_get_partition",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s544",
+      "mutex_name": "%23",
+      "function": "rd_kafka_q_io_event_enable",
+      "source_file": "rdkafka_queue.c",
+      "lock_source_line": 1131,
+      "unlock_source_lines": [
+        1141,
+        1141
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s548",
+      "mutex_name": "%19",
+      "function": "rd_kafka_q_cb_event_enable",
+      "source_file": "rdkafka_queue.c",
+      "lock_source_line": 1174,
+      "unlock_source_lines": [
+        1184,
+        1184
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s549",
+      "mutex_name": "%21",
+      "function": "rd_kafka_queue_cb_event_enable",
+      "source_file": "rdkafka_queue.c",
+      "lock_source_line": 1174,
+      "unlock_source_lines": [
+        1184,
+        1184
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s553",
+      "mutex_name": "%3",
+      "function": "rd_kafka_q_dump",
+      "source_file": "rdkafka_queue.c",
+      "lock_source_line": 1302,
+      "unlock_source_lines": [
+        1343,
+        1343,
+        1343,
+        1343
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s566",
+      "mutex_name": "%7",
+      "function": "rd_kafka_op_req0",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s570",
+      "mutex_name": "%3",
+      "function": "rd_avg_add",
+      "source_file": "./rdavg.h",
+      "lock_source_line": 78,
+      "unlock_source_lines": [
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s717",
+      "mutex_name": "%210",
+      "function": "rd_kafka_MetadataRequest0",
+      "source_file": "rdkafka_request.c",
+      "lock_source_line": 2981,
+      "unlock_source_lines": [
+        2981
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s753",
+      "mutex_name": "%90",
+      "function": "rd_kafkap_share_leader_changes_apply",
+      "source_file": "rdkafka_request.c",
+      "lock_source_line": 3785,
+      "unlock_source_lines": [
+        3787
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s819",
+      "mutex_name": "%10",
+      "function": "rd_kafka_handle_Produce_metadata_update",
+      "source_file": "rdkafka_request.c",
+      "lock_source_line": 3884,
+      "unlock_source_lines": [
+        3886
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s884",
+      "mutex_name": "%68",
+      "function": "unittest_request",
+      "source_file": "rdkafka_request.c",
+      "lock_source_line": 7030,
+      "unlock_source_lines": [
+        7032
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s894",
+      "mutex_name": "%37",
+      "function": "rd_kafka_cgrp_set_join_state",
+      "source_file": "./rdavg.h",
+      "lock_source_line": 78,
+      "unlock_source_lines": [
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s901",
+      "mutex_name": "%41",
+      "function": "rd_kafka_cgrp_assigned_offsets_commit",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s913",
+      "mutex_name": "%2",
+      "function": "rd_kafka_q_dest_name",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 184,
+      "unlock_source_lines": [
+        189,
+        189
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s922",
+      "mutex_name": "%2",
+      "function": "rd_kafka_q_disable0",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s932",
+      "mutex_name": "%4",
+      "function": "rd_kafka_replyq_make.2946",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s936",
+      "mutex_name": "%65",
+      "function": "rd_kafka_cgrp_coord_query",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s980",
+      "mutex_name": "%333",
+      "function": "rd_kafka_cgrp_assignor_handle_Metadata_op",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s981",
+      "mutex_name": "%5",
+      "function": "rd_kafka_op_set_replyq",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1004",
+      "mutex_name": "%13",
+      "function": "rd_kafka_cgrp_serve",
+      "source_file": "rdkafka_cgrp.c",
+      "lock_source_line": 7216,
+      "unlock_source_lines": [
+        7218
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1005",
+      "mutex_name": "%150",
+      "function": "rd_kafka_cgrp_serve",
+      "source_file": "./rdkafka_broker.h",
+      "lock_source_line": 586,
+      "unlock_source_lines": [
+        591
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1008",
+      "mutex_name": "%168",
+      "function": "rd_kafka_cgrp_join_state_serve",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1011",
+      "mutex_name": "%185",
+      "function": "rd_kafka_cgrp_consumer_group_heartbeat",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1035",
+      "mutex_name": "%36",
+      "function": "rd_kafka_cgrp_consumer_next_target_assignment_request_metadata",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1045",
+      "mutex_name": "%88",
+      "function": "rd_kafka_toppar_consumer_lag_tmr_cb",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1046",
+      "mutex_name": "%80",
+      "function": "rd_kafka_toppar_lag_handle_Offset",
+      "source_file": "rdkafka_partition.c",
+      "lock_source_line": 105,
+      "unlock_source_lines": [
+        107
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1061",
+      "mutex_name": "%2",
+      "function": "rd_kafka_q_keep.3391",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1070",
+      "mutex_name": "%4",
+      "function": "rd_kafka_toppar_purge_and_disable_queues",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1071",
+      "mutex_name": "%14",
+      "function": "rd_kafka_toppar_purge_and_disable_queues",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1075",
+      "mutex_name": "%49",
+      "function": "rd_kafka_toppar_offset_request",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1077",
+      "mutex_name": "%182",
+      "function": "rd_kafka_toppar_offset_request",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1085",
+      "mutex_name": "%42",
+      "function": "rd_kafka_toppar_op_pause_resume",
+      "source_file": "rdkafka_partition.c",
+      "lock_source_line": 2513,
+      "unlock_source_lines": [
+        2515
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1089",
+      "mutex_name": "%3",
+      "function": "rd_kafka_toppar_broker",
+      "source_file": "rdkafka_partition.c",
+      "lock_source_line": 2719,
+      "unlock_source_lines": [
+        2727,
+        2727,
+        2727
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1090",
+      "mutex_name": "%22",
+      "function": "rd_kafka_toppar_leader_unavailable",
+      "source_file": "rdkafka_partition.c",
+      "lock_source_line": 2751,
+      "unlock_source_lines": [
+        2753
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1091",
+      "mutex_name": "%8",
+      "function": "rd_kafka_toppar_is_on_cgrp",
+      "source_file": "rdkafka_partition.c",
+      "lock_source_line": 2766,
+      "unlock_source_lines": [
+        2772
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1093",
+      "mutex_name": "%53",
+      "function": "rd_kafka_topic_partition_list_query_leaders_async",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1094",
+      "mutex_name": "%77",
+      "function": "rd_kafka_topic_partition_list_query_leaders_async",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 1027,
+      "unlock_source_lines": [
+        1029
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1104",
+      "mutex_name": "%2",
+      "function": "rd_kafka_enq_once_del_source",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 1048,
+      "unlock_source_lines": [
+        1052
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1110",
+      "mutex_name": "%11",
+      "function": "rd_kafka_purge_ua_toppar_queues",
+      "source_file": "rdkafka_partition.c",
+      "lock_source_line": 4903,
+      "unlock_source_lines": [
+        4907,
+        4907
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1112",
+      "mutex_name": "%26",
+      "function": "rd_kafka_share_ack_batch_resolve_leader_or_fail_acks",
+      "source_file": "rdkafka_share_acknowledgement.c",
+      "lock_source_line": 445,
+      "unlock_source_lines": [
+        450,
+        450
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1124",
+      "mutex_name": "%157",
+      "function": "rd_kafka_assignment_add",
+      "source_file": "rdkafka_assignment.c",
+      "lock_source_line": 970,
+      "unlock_source_lines": [
+        981,
+        981
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1246",
+      "mutex_name": "%7085",
+      "function": "rd_kafka_parse_Metadata0",
+      "source_file": "rdkafka_metadata.c",
+      "lock_source_line": 1095,
+      "unlock_source_lines": [
+        1095
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1258",
+      "mutex_name": "%18",
+      "function": "rd_kafka_metadata_leader_query_tmr_cb",
+      "source_file": "rdkafka_metadata.c",
+      "lock_source_line": 1887,
+      "unlock_source_lines": [
+        0,
+        0,
+        0
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1259",
+      "mutex_name": "%38",
+      "function": "rd_kafka_metadata_leader_query_tmr_cb",
+      "source_file": "rdkafka_metadata.c",
+      "lock_source_line": 1902,
+      "unlock_source_lines": [
+        1905,
+        1905
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1260",
+      "mutex_name": "%20",
+      "function": "rd_kafka_metadata_update_op",
+      "source_file": "rdkafka_metadata.c",
+      "lock_source_line": 2317,
+      "unlock_source_lines": [
+        2322
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1275",
+      "mutex_name": "%61",
+      "function": "rd_kafka_metadata_cache_evict_tmr_cb",
+      "source_file": "rdkafka_metadata_cache.c",
+      "lock_source_line": 991,
+      "unlock_source_lines": [
+        993
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1287",
+      "mutex_name": "%3",
+      "function": "rd_kafka_metadata_cache_wait_state_change_async",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 1027,
+      "unlock_source_lines": [
+        1029
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1288",
+      "mutex_name": "%3",
+      "function": "rd_kafka_metadata_cache_wait_change",
+      "source_file": "rdkafka_metadata_cache.c",
+      "lock_source_line": 955,
+      "unlock_source_lines": [
+        958
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1296",
+      "mutex_name": "%48",
+      "function": "rd_kafka_sasl_client_new",
+      "source_file": "rdkafka_sasl.c",
+      "lock_source_line": 270,
+      "unlock_source_lines": [
+        270
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1297",
+      "mutex_name": "%15",
+      "function": "rd_kafka_sasl_term",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1299",
+      "mutex_name": "%10",
+      "function": "rd_kafka_sasl_set_credentials",
+      "source_file": "rdkafka_sasl.c",
+      "lock_source_line": 571,
+      "unlock_source_lines": [
+        581
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1303",
+      "mutex_name": "%4",
+      "function": "rd_kafka_sasl_plain_conf_validate",
+      "source_file": "rdkafka_sasl_plain.c",
+      "lock_source_line": 124,
+      "unlock_source_lines": [
+        126,
+        126
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1426",
+      "mutex_name": "%48",
+      "function": "rd_kafka_admin_request_op_new",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1427",
+      "mutex_name": "%71",
+      "function": "rd_kafka_admin_request_op_new",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1444",
+      "mutex_name": "%2",
+      "function": "rd_kafka_enq_once_add_source",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 1027,
+      "unlock_source_lines": [
+        1029
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1445",
+      "mutex_name": "%4",
+      "function": "rd_kafka_replyq_make.5322",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1446",
+      "mutex_name": "%18",
+      "function": "rd_kafka_admin_coord_request",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 1027,
+      "unlock_source_lines": [
+        1029
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1450",
+      "mutex_name": "%2",
+      "function": "rd_kafka_enq_once_del_source.5335",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 1048,
+      "unlock_source_lines": [
+        1052
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1454",
+      "mutex_name": "%2",
+      "function": "rd_kafka_enq_once_del_source_return",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 1084,
+      "unlock_source_lines": [
+        1094,
+        1094
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1593",
+      "mutex_name": "%61",
+      "function": "rd_kafka_DeleteRecords",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1594",
+      "mutex_name": "%45",
+      "function": "rd_kafka_admin_fanout_op_new",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1950",
+      "mutex_name": "%9",
+      "function": "rd_kafka_background_thread_main",
+      "source_file": "rdkafka_background.c",
+      "lock_source_line": 125,
+      "unlock_source_lines": [
+        128
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1951",
+      "mutex_name": "%46",
+      "function": "rd_kafka_background_thread_main",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1956",
+      "mutex_name": "%41",
+      "function": "rd_kafka_background_thread_create",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s1961",
+      "mutex_name": "%173",
+      "function": "rd_kafka_idemp_pid_fsm",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1963",
+      "mutex_name": "%213",
+      "function": "rd_kafka_idemp_pid_fsm",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1969",
+      "mutex_name": "%21",
+      "function": "rd_kafka_idemp_pid_update",
+      "source_file": "rdkafka_idempotence.c",
+      "lock_source_line": 480,
+      "unlock_source_lines": [
+        480
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s2003",
+      "mutex_name": "%51",
+      "function": "rd_kafka_txn_coord_query",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2019",
+      "mutex_name": "%25",
+      "function": "rd_kafka_init_transactions",
+      "source_file": "rdkafka_txnmgr.c",
+      "lock_source_line": 1374,
+      "unlock_source_lines": [
+        1377,
+        1377,
+        1377
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2037",
+      "mutex_name": "%16",
+      "function": "rd_kafka_txn_send_TxnOffsetCommitRequest",
+      "source_file": "rdkafka_txnmgr.c",
+      "lock_source_line": 1659,
+      "unlock_source_lines": [
+        1661,
+        1669,
+        1669
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2044",
+      "mutex_name": "%19",
+      "function": "rd_kafka_txn_complete",
+      "source_file": "rdkafka_txnmgr.c",
+      "lock_source_line": 1217,
+      "unlock_source_lines": [
+        1220
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s2045",
+      "mutex_name": "%9",
+      "function": "rd_kafka_txn_clear_pending_partitions",
+      "source_file": "rdkafka_txnmgr.c",
+      "lock_source_line": 1217,
+      "unlock_source_lines": [
+        1220
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2046",
+      "mutex_name": "%34",
+      "function": "rd_kafka_txn_clear_pending_partitions",
+      "source_file": "rdkafka_txnmgr.c",
+      "lock_source_line": 1217,
+      "unlock_source_lines": [
+        1220
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2058",
+      "mutex_name": "%4",
+      "function": "rd_kafka_replyq_make.6136",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s2063",
+      "mutex_name": "%58",
+      "function": "rd_kafka_txns_term",
+      "source_file": "rdkafka_txnmgr.c",
+      "lock_source_line": 1217,
+      "unlock_source_lines": [
+        1220
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s2095",
+      "mutex_name": "%1508",
+      "function": "rd_kafka_unittest_msgset_errors",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2097",
+      "mutex_name": "%1693",
+      "function": "rd_kafka_unittest_msgset_errors",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2099",
+      "mutex_name": "%2049",
+      "function": "rd_kafka_unittest_msgset_errors",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2114",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_clear_request_errors",
+      "source_file": "rdkafka_mock.c",
+      "lock_source_line": 2456,
+      "unlock_source_lines": [
+        2462,
+        2462,
+        2462
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2115",
+      "mutex_name": "%5",
+      "function": "rd_kafka_mock_push_request_errors_array",
+      "source_file": "rdkafka_mock.c",
+      "lock_source_line": 2475,
+      "unlock_source_lines": [
+        2492,
+        2492,
+        2492
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2116",
+      "mutex_name": "%7",
+      "function": "rd_kafka_mock_broker_push_request_error_rtts",
+      "source_file": "rdkafka_mock.c",
+      "lock_source_line": 2523,
+      "unlock_source_lines": [
+        2526,
+        2526,
+        2549,
+        2549
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2117",
+      "mutex_name": "%9",
+      "function": "rd_kafka_mock_broker_error_stack_cnt",
+      "source_file": "rdkafka_mock.c",
+      "lock_source_line": 2566,
+      "unlock_source_lines": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2119",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_group_initial_rebalance_delay_ms",
+      "source_file": "rdkafka_mock.c",
+      "lock_source_line": 3253,
+      "unlock_source_lines": [
+        3255
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2120",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_set_controller_id",
+      "source_file": "rdkafka_mock.c",
+      "lock_source_line": 3260,
+      "unlock_source_lines": [
+        3262
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2121",
+      "mutex_name": "%293",
+      "function": "rd_kafka_mock_cluster_thread_main",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 200,
+      "unlock_source_lines": [
+        203
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2143",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_get_requests",
+      "source_file": "rdkafka_mock.c",
+      "lock_source_line": 3594,
+      "unlock_source_lines": [
+        3605,
+        3605
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2422",
+      "mutex_name": "%609",
+      "function": "rd_kafka_mock_handle_AddPartitionsToTxn",
+      "source_file": "rdkafka_mock_handlers.c",
+      "lock_source_line": 2239,
+      "unlock_source_lines": [
+        2242
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2655",
+      "mutex_name": "%9",
+      "function": "rd_kafka_mock_handle_PushTelemetry_decode_error",
+      "source_file": "rdkafka_mock_handlers.c",
+      "lock_source_line": 2788,
+      "unlock_source_lines": [
+        2788
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2658",
+      "mutex_name": "%31",
+      "function": "rd_kafka_mock_pid_new",
+      "source_file": "rdkafka_mock_handlers.c",
+      "lock_source_line": 1967,
+      "unlock_source_lines": [
+        1970
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2660",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_set_group_consumer_session_timeout_ms",
+      "source_file": "rdkafka_mock_cgrp.c",
+      "lock_source_line": 1802,
+      "unlock_source_lines": [
+        1805
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2661",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_set_group_consumer_heartbeat_interval_ms",
+      "source_file": "rdkafka_mock_cgrp.c",
+      "lock_source_line": 1811,
+      "unlock_source_lines": [
+        1814
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2665",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_session_timeout",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 716,
+      "unlock_source_lines": [
+        718
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2666",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_heartbeat_interval",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 727,
+      "unlock_source_lines": [
+        730
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2667",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_max_delivery_attempts",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 740,
+      "unlock_source_lines": [
+        744,
+        744
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2668",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_record_lock_duration",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 754,
+      "unlock_source_lines": [
+        759,
+        759
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2669",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_isolation_level",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 769,
+      "unlock_source_lines": [
+        773,
+        773
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2670",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_max_size",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 782,
+      "unlock_source_lines": [
+        786,
+        786
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2671",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_max_fetch_sessions",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 796,
+      "unlock_source_lines": [
+        800,
+        800
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2672",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_max_record_locks",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 811,
+      "unlock_source_lines": [
+        815,
+        815
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2673",
+      "mutex_name": "%3",
+      "function": "rd_kafka_mock_sharegroup_set_auto_offset_reset",
+      "source_file": "rdkafka_mock_sharegrp.c",
+      "lock_source_line": 825,
+      "unlock_source_lines": [
+        829,
+        829
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2909",
+      "mutex_name": "%2169",
+      "function": "rd_kafka_fetch_reply_handle_partition",
+      "source_file": "rdkafka_fetcher.c",
+      "lock_source_line": 628,
+      "unlock_source_lines": [
+        636
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2924",
+      "mutex_name": "%14",
+      "function": "rd_kafka_handle_Fetch_metadata_update",
+      "source_file": "rdkafka_fetcher.c",
+      "lock_source_line": 427,
+      "unlock_source_lines": [
+        429
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2943",
+      "mutex_name": "%59",
+      "function": "rd_kafka_telemetry_fsm_tmr_cb",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2947",
+      "mutex_name": "%120",
+      "function": "rd_kafka_send_push_telemetry",
+      "source_file": "./rdkafka_queue.h",
+      "lock_source_line": 158,
+      "unlock_source_lines": [
+        160
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2948",
+      "mutex_name": "%50",
+      "function": "rd_kafka_handle_get_telemetry_subscriptions",
+      "source_file": "rdkafka_telemetry.c",
+      "lock_source_line": 533,
+      "unlock_source_lines": [
+        538,
+        538
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2957",
+      "mutex_name": "%7",
+      "function": "rd_kafka_set_telemetry_broker_maybe",
+      "source_file": "rdkafka_telemetry.c",
+      "lock_source_line": 711,
+      "unlock_source_lines": [
+        721,
+        714
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2959",
+      "mutex_name": "%4",
+      "function": "rd_avg_rollover",
+      "source_file": "./rdavg.h",
+      "lock_source_line": 142,
+      "unlock_source_lines": [
+        146,
+        219,
+        219,
+        219
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s2960",
+      "mutex_name": "%48",
+      "function": "serialize_Metric",
+      "source_file": "rdkafka_telemetry_encode.c",
+      "lock_source_line": 929,
+      "unlock_source_lines": [
+        931
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s2975",
+      "mutex_name": "%3",
+      "function": "unit_test_telemetry_set_rebalance_latency",
+      "source_file": "./rdavg.h",
+      "lock_source_line": 78,
+      "unlock_source_lines": [
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s2995",
+      "mutex_name": "%6",
+      "function": "rd_kafka_sasl_scram_conf_validate",
+      "source_file": "rdkafka_sasl_scram.c",
+      "lock_source_line": 740,
+      "unlock_source_lines": [
+        742,
+        742
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s3004",
+      "mutex_name": "%29",
+      "function": "rd_kafka_sasl_oauthbearer_init",
+      "source_file": "rdkafka_sasl_oauthbearer.c",
+      "lock_source_line": 0,
+      "unlock_source_lines": [
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s3006",
+      "mutex_name": "%7",
+      "function": "rd_kafka_sasl_oauthbearer_ready",
+      "source_file": "rdkafka_sasl_oauthbearer.c",
+      "lock_source_line": 241,
+      "unlock_source_lines": [
+        243
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s3017",
+      "mutex_name": "%19",
+      "function": "rd_kafka_oauthbearer_set_token_failure0",
+      "source_file": "rdkafka_sasl_oauthbearer.c",
+      "lock_source_line": 484,
+      "unlock_source_lines": [
+        491
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    }
+  ],
+  "warnings": [
+    "1087 sites contain unresolved indirect calls (CHA fallback applied)."
+  ]
+}
