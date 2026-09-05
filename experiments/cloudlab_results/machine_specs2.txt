@@ -1,0 +1,12 @@
+========================================
+    CLOUDLAB EXPERIMENT MACHINE SPECS (NODE 2)
+========================================
+Date       : Tue Jul 28 01:27:23 AM MDT 2026
+Hostname   : node0.crux-test.dlock-pg0.utah.cloudlab.us
+OS Kernel  : Linux node0.crux-test.dlock-pg0.utah.cloudlab.us 5.15.0-177-generic #187-Ubuntu SMP Sat Apr 11 22:54:33 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+CPU Model  : AMD EPYC 7402P 24-Core Processor
+CPU Cores  : 48 vCPUs
+Total RAM  : 125Gi
+GCC Ver    : gcc (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0
+Clang Ver  : 
+========================================

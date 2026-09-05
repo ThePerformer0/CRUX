@@ -1,0 +1,2 @@
+Lock_ID,File,Function,Line,Detected_Pattern,Is_True_Positive,Benchmark_Tool,Base_Perf,Patched_Perf,Gain_Percent
+s83,thread.c,notify_worker_fd,976,LOCAL_VARS,Oui,memtier_benchmark (16t),"381.6K ops/sec (2.1ms avg)","388.9K ops/sec (2.0ms avg)","+1.91%"

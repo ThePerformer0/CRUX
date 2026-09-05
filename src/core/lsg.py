@@ -168,12 +168,8 @@ class LockSiteGraph:
                 share_neighbors.add(v)
 
         for neighbor in share_neighbors:
-            has_hb = False
-            for u, v, data in self.graph.edges(data=True):
-                if data.get("kind") == EdgeKind.HB:
-                    if (u == site_id and v == neighbor) or (u == neighbor and v == site_id):
-                        has_hb = True
-                        break
+            has_hb = self.graph.has_edge(site_id, neighbor, key=EdgeKind.HB.value) or \
+                     self.graph.has_edge(neighbor, site_id, key=EdgeKind.HB.value)
             if not has_hb:
                 return False
         return True

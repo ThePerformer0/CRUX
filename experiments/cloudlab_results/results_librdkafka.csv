@@ -1,0 +1,4 @@
+Lock_ID,File,Function,Line,Detected_Pattern,Is_True_Positive,Benchmark_Tool,Base_Perf,Patched_Perf,Gain_Percent
+s279,rdkafka_broker.c,rd_kafka_broker_thread_main,4914,EMPTY_CS,Oui (Barrier Pattern),N/A (Barrier - non supprime),N/A,N/A,N/A
+s385,rdkafka_broker.c,rd_kafka_all_brokers_wakeup,6095,REDUNDANT,Oui (Sur-synchronisation),bench_wakeup (16 brokers),"6.29M broadcasts/sec (0.318s)","111.20M broadcasts/sec (0.018s)","+1667.84%"
+s69,rdavg.h,rd_kafka_stats_emit_avg,142,LOCAL_VARS,Oui (Mutex sur pile),bench_stats (10M iters),"52.14M ops/sec (0.192s)","111.31M ops/sec (0.090s)","+113.47%"
