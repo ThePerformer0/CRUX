@@ -1,0 +1,7 @@
+{
+  "visibility": 1,
+  "concurrency": 0,
+  "writes": 0,
+  "invariant": 0,
+  "obfuscation": 0
+}
