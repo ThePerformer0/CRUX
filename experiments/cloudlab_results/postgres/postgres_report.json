@@ -3,6 +3,8 @@
     "tool": "crux",
     "version": "3.0",
     "llvm_ir_file": "/users/Jim0/repos/postgres/postgres.ll",
+    "llvm_ir_size_bytes": 365350637,
+    "llvm_ir_size_formatted": "365.4 MB",
     "analysis_time_seconds": 599.57,
     "alias_analysis": "field-based",
     "interprocedural": true,

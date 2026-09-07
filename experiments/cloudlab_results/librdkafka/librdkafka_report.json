@@ -3,6 +3,8 @@
     "tool": "crux",
     "version": "3.0",
     "llvm_ir_file": "/users/Jim0/repos/librdkafka/librdkafka.ll",
+    "llvm_ir_size_bytes": 97596688,
+    "llvm_ir_size_formatted": "97.6 MB",
     "analysis_time_seconds": 182.15,
     "alias_analysis": "field-based",
     "interprocedural": true,

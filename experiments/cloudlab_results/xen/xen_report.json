@@ -3,6 +3,8 @@
     "tool": "crux",
     "version": "3.0",
     "llvm_ir_file": "/users/Jim0/repos/xen/xen/xen-syms.ll",
+    "llvm_ir_size_bytes": 209446424,
+    "llvm_ir_size_formatted": "209.4 MB",
     "analysis_time_seconds": 147.52,
     "alias_analysis": "field-based",
     "interprocedural": true,

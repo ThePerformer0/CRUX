@@ -3,6 +3,8 @@
     "tool": "crux",
     "version": "3.0",
     "llvm_ir_file": "/users/Jim0/repos/h2o/build/h2o.ll",
+    "llvm_ir_size_bytes": 67366168,
+    "llvm_ir_size_formatted": "67.4 MB",
     "analysis_time_seconds": 71.55,
     "alias_analysis": "field-based",
     "interprocedural": true,

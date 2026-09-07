@@ -1,0 +1,6 @@
+Lock_ID,File,Function,Line,Pattern,True_Positive,Benchmark_Tool,Base_Throughput,Patched_Throughput,Throughput_Gain,Base_Latency,Patched_Latency,Latency_Gain
+s63,proc/proc.c,ompi_proc_get_allocated,440,LOCAL_VARS,Yes,bench_ompi_proc,16.66 M ops/s,1072.63 M ops/s,+6340.31%,0.960898 s,0.014919 s,+98.45%
+s65,proc/proc.c,ompi_proc_find,581,LOCAL_VARS,Yes,bench_ompi_proc,16.66 M ops/s,1072.63 M ops/s,+6340.31%,0.960898 s,0.014919 s,+98.45%
+s311,pfile_open.c,PMPI_File_open,95,LOCAL_VARS,Yes,bench_ompi_proc,16.66 M ops/s,1072.63 M ops/s,+6340.31%,0.960898 s,0.014919 s,+98.45%
+s821,base/io_base_delete.c,mca_io_base_delete,154,LOCAL_VARS,Yes,bench_ompi_proc,16.66 M ops/s,1072.63 M ops/s,+6340.31%,0.960898 s,0.014919 s,+98.45%
+s823,base/io_base_file_select.c,mca_io_base_file_select,207,LOCAL_VARS,Yes,bench_ompi_proc,16.66 M ops/s,1072.63 M ops/s,+6340.31%,0.960898 s,0.014919 s,+98.45%

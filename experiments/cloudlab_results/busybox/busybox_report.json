@@ -1,0 +1,25 @@
+{
+  "metadata": {
+    "tool": "crux",
+    "version": "3.0",
+    "llvm_ir_file": "/users/Jim0/repos/busybox/busybox.ll",
+    "llvm_ir_size_bytes": 54079900,
+    "llvm_ir_size_formatted": "54.1 MB",
+    "analysis_time_seconds": 51.62,
+    "alias_analysis": "field-based",
+    "interprocedural": true,
+    "smt_enabled": true
+  },
+  "summary": {
+    "total_sites": 0,
+    "useless_sites": 0,
+    "useful_sites": 0,
+    "edges": {
+      "share": 0,
+      "nest": 0,
+      "hb": 0
+    }
+  },
+  "useless_sites": [],
+  "warnings": []
+}

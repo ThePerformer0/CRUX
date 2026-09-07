@@ -3,6 +3,8 @@
     "tool": "crux",
     "version": "3.0",
     "llvm_ir_file": "/users/Jim0/repos/memcached/memcached.ll",
+    "llvm_ir_size_bytes": 8025408,
+    "llvm_ir_size_formatted": "8.0 MB",
     "analysis_time_seconds": 11.13,
     "alias_analysis": "field-based",
     "interprocedural": true,
