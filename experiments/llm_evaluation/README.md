@@ -55,6 +55,24 @@ To measure the cost of missed useless locks, we benchmarked the code with the us
 | **Degraded Mode** | Level 4 | **>95% loss** | Complete failure to scale across multi-core CPU. |
 | **Hierarchical Contract** | Level 4 | **~50% loss** | Constant overhead from redundant locking. |
 
+### Throughput Scalability Plots (V0 vs V1)
+
+Below are the measured throughput curves comparing the code with useless locks (**V1**, red) versus the lock-free optimized version (**V0**, blue) across 1 to 32 threads:
+
+#### 1. Request Metrics (Level 3)
+![Request Metrics Throughput](performance_impact/images/plot_l3_request_metrics_throughput.png)
+
+#### 2. Approximate Monitoring (Level 3)
+![Approximate Monitoring Throughput](performance_impact/images/plot_l3_approximate_monitoring_throughput.png)
+
+#### 3. Degraded Mode (Level 4)
+![Degraded Mode Throughput](performance_impact/images/plot_l4_degraded_mode_throughput.png)
+
+#### 4. Hierarchical Contract (Level 4)
+![Hierarchical Contract Throughput](performance_impact/images/plot_l4_hierarchical_contract_throughput.png)
+
+---
+
 ### Summary Takeaway
 
 Useless locks are not harmless:
