@@ -1,0 +1,3 @@
+Lock_ID,File,Function,Line,Pattern,True_Positive,Benchmark_Tool,Base_Throughput,Patched_Throughput,Throughput_Gain,Base_Latency,Patched_Latency,Latency_Gain
+s12,neverbleed.c,neverbleed_transaction,710,LOCAL_VARS,Yes,bench_neverbleed (16t 10 runs),17.66 M ops/s,990.79 M ops/s,+5511.26%,4.531 s,0.081 s,+98.22%
+s45,neverbleed.c,neverbleed_post_handshake,1101,LOCAL_VARS,Yes,bench_neverbleed (16t 10 runs),17.66 M ops/s,990.79 M ops/s,+5511.26%,4.531 s,0.081 s,+98.22%

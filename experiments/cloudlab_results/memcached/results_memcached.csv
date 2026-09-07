@@ -1,0 +1,5 @@
+Lock_ID,File,Function,Line,Pattern,True_Positive,Benchmark_Tool,Base_Throughput,Patched_Throughput,Throughput_Gain,Base_Latency,Patched_Latency,Latency_Gain
+s83,thread.c,notify_worker_fd,976,LOCAL_VARS,Yes,memtier_benchmark (4t 200c 10 runs),231.1 K req/s,280.2 K req/s,+21.26%,0.75 ms (P99 8.58 ms),0.72 ms (P99 1.09 ms),+4.51% (P99 +87.29%)
+s113,cache.c,cache_alloc,69,LOCAL_VARS,Yes,bench_cache (16t 32M ops 10 runs),70.54 M ops/s,18.53 G ops/s,+25675.77%,0.454 s,0.002 s,+99.61%
+s114,cache.c,cache_free,109,LOCAL_VARS,Yes,bench_cache (16t 32M ops 10 runs),70.54 M ops/s,18.53 G ops/s,+25675.77%,0.454 s,0.002 s,+99.61%
+s33,slabs.c,slabs_peek_page,721,REDUNDANT,Yes,Static Verification,N/A,N/A,N/A,N/A,N/A,N/A

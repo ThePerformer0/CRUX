@@ -1,5 +1,0 @@
-Lock_ID,File,Function,Line,Detected_Pattern,Is_True_Positive,Benchmark_Tool,Base_Perf,Patched_Perf,Gain_Percent
-s74,deps/neverbleed/neverbleed.c,sign_stub,710,LOCAL_VARS,Oui,bench_neverbleed (16t),"17.57M ops/sec (4.554s)","990.04M ops/sec (0.081s)","+5535.76%"
-s75,deps/neverbleed/neverbleed.c,digestsign_stub,1101,LOCAL_VARS,Oui,bench_neverbleed (16t),"17.57M ops/sec (4.554s)","990.04M ops/sec (0.081s)","+5535.76%"
-s76,deps/neverbleed/neverbleed.c,decrypt_stub,1101,LOCAL_VARS,Oui,bench_neverbleed (16t),"17.57M ops/sec (4.554s)","990.04M ops/sec (0.081s)","+5535.76%"
-s78,deps/neverbleed/neverbleed.c,priv_encdec_stub,710,LOCAL_VARS,Oui,bench_neverbleed (16t),"17.57M ops/sec (4.554s)","990.04M ops/sec (0.081s)","+5535.76%"

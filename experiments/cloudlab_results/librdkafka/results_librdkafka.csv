@@ -1,0 +1,4 @@
+Lock_ID,File,Function,Line,Pattern,True_Positive,Benchmark_Tool,Base_Throughput,Patched_Throughput,Throughput_Gain,Base_Latency,Patched_Latency,Latency_Gain
+s385,rdkafka_broker.c,rd_kafka_all_brokers_wakeup,6095,REDUNDANT,Yes,bench_wakeup (16 brokers 10 runs),6.28 M broadcasts/s,111.30 M broadcasts/s,+1670.95%,0.318 s,0.018 s,+94.34%
+s69,rdavg.h,rd_kafka_stats_emit_avg,142,LOCAL_VARS,Yes,bench_stats (10M iters 10 runs),51.99 M ops/s,111.22 M ops/s,+113.94%,0.192 s,0.090 s,+53.17%
+s234,rdkafka_broker.c,rd_kafka_broker_thread_main,4914,EMPTY_CS,Yes,Static Verification,N/A,N/A,N/A,N/A,N/A,N/A

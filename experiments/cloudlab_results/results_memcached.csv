@@ -1,6 +1,0 @@
-Lock_ID,File,Function,Line,Detected_Pattern,Is_True_Positive,Benchmark_Tool,Base_Perf,Patched_Perf,Gain_Percent
-s113,cache.c,cache_alloc,69,LOCAL_VARS,Oui (Cache local thread),bench_cache (16t 32M ops),"71.39M ops/sec (0.448s)","17598.79M ops/sec (0.002s)","+24550.58%"
-s114,cache.c,cache_free,109,LOCAL_VARS,Oui (Cache local thread),bench_cache (16t 32M ops),"71.39M ops/sec (0.448s)","17598.79M ops/sec (0.002s)","+24550.58%"
-s83,thread.c,notify_worker_fd,976,LOCAL_VARS,Oui (Queue de connexion),memtier_benchmark (4t 200c),"231.1K ops/sec (0.75ms avg)","274.5K ops/sec (0.72ms avg)","+18.78%"
-s33,slabs.c,slabs_peek_page,721,REDUNDANT,Oui (Slab verrouille appelant),N/A (Lecture seule),N/A,N/A,N/A
-

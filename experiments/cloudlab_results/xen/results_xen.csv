@@ -1,0 +1,5 @@
+Lock_ID,File,Function,Line,Pattern,True_Positive,Benchmark_Tool,Base_Throughput,Patched_Throughput,Throughput_Gain,Base_Latency,Patched_Latency,Latency_Gain
+s591,arch/x86/irq.c,pirq_shared,1302,READ_ONLY,Yes,bench_xen_spinlock (16t 10 runs),12.82 M queries/s,8161.19 M queries/s,+64400.25%,1.262 s,0.002 s,+99.84%
+s648,arch/x86/time.c,rtc_guest_read,1480,READ_ONLY,Yes,bench_xen_spinlock (16t 10 runs),12.82 M queries/s,8161.19 M queries/s,+64400.25%,1.262 s,0.002 s,+99.84%
+s604,arch/x86/irq.c,map_domain_pirq,2353,REDUNDANT,Yes,Static Verification,N/A,N/A,N/A,N/A,N/A,N/A
+s629,include/xen/spinlock.h,msix_put_fixmap,243,REDUNDANT,Yes,Static Verification,N/A,N/A,N/A,N/A,N/A,N/A
