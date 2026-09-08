@@ -1,0 +1,1047 @@
+{
+  "metadata": {
+    "tool": "crux",
+    "version": "3.0",
+    "llvm_ir_file": "/users/Jim0/repos/linux/vmlinux.ll",
+    "analysis_time_seconds": 1991.68,
+    "alias_analysis": "field-based",
+    "interprocedural": true,
+    "smt_enabled": true
+  },
+  "summary": {
+    "total_sites": 9152,
+    "useless_sites": 77,
+    "useful_sites": 9075,
+    "edges": {
+      "share": 63490206,
+      "nest": 2487,
+      "hb": 0
+    }
+  },
+  "useless_sites": [
+    {
+      "id": "s49",
+      "mutex_name": "@i8259A_lock",
+      "function": "probe_8259A",
+      "source_file": "arch/x86/kernel/i8259.c",
+      "lock_source_line": 313,
+      "unlock_source_lines": [
+        323,
+        323
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s55",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "sbf_read",
+      "source_file": "arch/x86/kernel/bootflag.c",
+      "lock_source_line": 62,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s56",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "sbf_write",
+      "source_file": "arch/x86/kernel/bootflag.c",
+      "lock_source_line": 48,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s295",
+      "mutex_name": "@uts_sem",
+      "function": "__do_sys_uname",
+      "source_file": "kernel/sys.c",
+      "lock_source_line": 1300,
+      "unlock_source_lines": [
+        1302
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s301",
+      "mutex_name": "@uts_sem",
+      "function": "__do_sys_sethostname",
+      "source_file": "kernel/sys.c",
+      "lock_source_line": 1354,
+      "unlock_source_lines": [
+        1360
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s302",
+      "mutex_name": "@uts_sem",
+      "function": "__do_sys_setdomainname",
+      "source_file": "kernel/sys.c",
+      "lock_source_line": 1407,
+      "unlock_source_lines": [
+        1413
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s307",
+      "mutex_name": "@uts_sem",
+      "function": "__do_sys_newuname",
+      "source_file": "kernel/sys.c",
+      "lock_source_line": 1276,
+      "unlock_source_lines": [
+        1278
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s420",
+      "mutex_name": "%3",
+      "function": "atomic_notifier_chain_unregister",
+      "source_file": "kernel/notifier.c",
+      "lock_source_line": 167,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s421",
+      "mutex_name": "%9",
+      "function": "srcu_notifier_chain_unregister",
+      "source_file": "kernel/notifier.c",
+      "lock_source_line": 454,
+      "unlock_source_lines": [
+        456
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s424",
+      "mutex_name": "%9",
+      "function": "blocking_notifier_chain_unregister",
+      "source_file": "kernel/notifier.c",
+      "lock_source_line": 264,
+      "unlock_source_lines": [
+        266
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s616",
+      "mutex_name": "@syslog_lock",
+      "function": "syslog_print_all",
+      "source_file": "kernel/printk/printk.c",
+      "lock_source_line": 1616,
+      "unlock_source_lines": [
+        1618
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s640",
+      "mutex_name": "%20",
+      "function": "irq_set_affinity_notifier",
+      "source_file": "kernel/irq/manage.c",
+      "lock_source_line": 561,
+      "unlock_source_lines": [
+        564
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s816",
+      "mutex_name": "@timekeeper_lock",
+      "function": "pvclock_gtod_unregister_notifier",
+      "source_file": "kernel/time/timekeeping.c",
+      "lock_source_line": 685,
+      "unlock_source_lines": [
+        687
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s842",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "alarmtimer_get_rtcdev",
+      "source_file": "kernel/time/alarmtimer.c",
+      "lock_source_line": 76,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s850",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "alarmtimer_suspend",
+      "source_file": "kernel/time/alarmtimer.c",
+      "lock_source_line": 268,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s851",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "alarmtimer_suspend",
+      "source_file": "kernel/time/alarmtimer.c",
+      "lock_source_line": 268,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s958",
+      "mutex_name": "%30",
+      "function": "acct_get",
+      "source_file": "kernel/acct.c",
+      "lock_source_line": 161,
+      "unlock_source_lines": [
+        163
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1114",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "auditd_reset",
+      "source_file": "kernel/audit.c",
+      "lock_source_line": 626,
+      "unlock_source_lines": [
+        418,
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1401",
+      "mutex_name": "%11",
+      "function": "__perf_event_ctx_lock_double",
+      "source_file": "kernel/events/core.c",
+      "lock_source_line": 11935,
+      "unlock_source_lines": [
+        11939
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1432",
+      "mutex_name": "%9",
+      "function": "perf_event_ctx_lock_nested",
+      "source_file": "kernel/events/core.c",
+      "lock_source_line": 1357,
+      "unlock_source_lines": [
+        1359
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s1590",
+      "mutex_name": "@shrinker_rwsem",
+      "function": "free_prealloced_shrinker",
+      "source_file": "mm/vmscan.c",
+      "lock_source_line": 641,
+      "unlock_source_lines": [
+        643
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s3637",
+      "mutex_name": "%2",
+      "function": "sidtab_cancel_convert",
+      "source_file": "security/selinux/ss/sidtab.c",
+      "lock_source_line": 482,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s3929",
+      "mutex_name": "@pci_lock",
+      "function": "pci_bus_set_ops",
+      "source_file": "drivers/pci/access.c",
+      "lock_source_line": 188,
+      "unlock_source_lines": [
+        191
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s3998",
+      "mutex_name": "@vga_lock",
+      "function": "write_vga",
+      "source_file": "drivers/video/console/vgacon.c",
+      "lock_source_line": 153,
+      "unlock_source_lines": [
+        158
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s4007",
+      "mutex_name": "@vga_lock",
+      "function": "vgacon_set_cursor_size",
+      "source_file": "drivers/video/console/vgacon.c",
+      "lock_source_line": 475,
+      "unlock_source_lines": [
+        493,
+        493
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s4009",
+      "mutex_name": "%7",
+      "function": "backlight_device_unregister",
+      "source_file": "drivers/video/backlight/backlight.c",
+      "lock_source_line": 527,
+      "unlock_source_lines": [
+        529
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s4306",
+      "mutex_name": "%2",
+      "function": "tty_port_tty_get",
+      "source_file": "drivers/tty/tty_port.c",
+      "lock_source_line": 289,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s4443",
+      "mutex_name": "%5",
+      "function": "uart_get_rs485_config",
+      "source_file": "drivers/tty/serial/serial_core.c",
+      "lock_source_line": 1266,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s4446",
+      "mutex_name": "%9",
+      "function": "uart_get_iso7816_config",
+      "source_file": "drivers/tty/serial/serial_core.c",
+      "lock_source_line": 1310,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s4541",
+      "mutex_name": "@rng_mutex",
+      "function": "get_current_rng",
+      "source_file": "drivers/char/hw_random/core.c",
+      "lock_source_line": 126,
+      "unlock_source_lines": [
+        131
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s4750",
+      "mutex_name": "%2",
+      "function": "drm_master_internal_acquire",
+      "source_file": "drivers/gpu/drm/drm_auth.c",
+      "lock_source_line": 453,
+      "unlock_source_lines": [
+        455
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s5330",
+      "mutex_name": "%13",
+      "function": "scrub_guc_desc_for_outstanding_g2h",
+      "source_file": "drivers/gpu/drm/i915/gt/uc/intel_guc_submission.c",
+      "lock_source_line": 601,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s5460",
+      "mutex_name": "%11",
+      "function": "i915_hdcp_component_unbind",
+      "source_file": "drivers/gpu/drm/i915/display/intel_hdcp.c",
+      "lock_source_line": 2130,
+      "unlock_source_lines": [
+        2132
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s5461",
+      "mutex_name": "%35",
+      "function": "intel_hdcp_cleanup",
+      "source_file": "drivers/gpu/drm/i915/display/intel_hdcp.c",
+      "lock_source_line": 2491,
+      "unlock_source_lines": [
+        2493
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s5704",
+      "mutex_name": "@dev_pm_qos_mtx",
+      "function": "dev_pm_qos_drop_user_request",
+      "source_file": "drivers/base/power/qos.c",
+      "lock_source_line": 688,
+      "unlock_source_lines": [
+        690
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s5848",
+      "mutex_name": "@loop_validate_mutex",
+      "function": "loop_change_fd",
+      "source_file": "drivers/block/loop.c",
+      "lock_source_line": 794,
+      "unlock_source_lines": [
+        795
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s5851",
+      "mutex_name": "@loop_validate_mutex",
+      "function": "__loop_clr_fd",
+      "source_file": "drivers/block/loop.c",
+      "lock_source_line": 1343,
+      "unlock_source_lines": [
+        1344
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s5859",
+      "mutex_name": "@loop_validate_mutex",
+      "function": "loop_global_lock_killable",
+      "source_file": "drivers/block/loop.c",
+      "lock_source_line": 110,
+      "unlock_source_lines": [
+        116
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s5950",
+      "mutex_name": "%50",
+      "function": "scsi_device_dev_release_usercontext",
+      "source_file": "drivers/scsi/scsi_sysfs.c",
+      "lock_source_line": 484,
+      "unlock_source_lines": [
+        493
+      ],
+      "reasons": [
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s6008",
+      "mutex_name": "@sg_index_lock",
+      "function": "sg_proc_seq_show_debug",
+      "source_file": "drivers/scsi/sg.c",
+      "lock_source_line": 2568,
+      "unlock_source_lines": [
+        2592
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s6518",
+      "mutex_name": "%21",
+      "function": "ehci_hub_control",
+      "source_file": "drivers/usb/host/ehci-hub.c",
+      "lock_source_line": 838,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s6521",
+      "mutex_name": "%21",
+      "function": "ehci_hub_control",
+      "source_file": "drivers/usb/host/ehci-hub.c",
+      "lock_source_line": 1073,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s6522",
+      "mutex_name": "%21",
+      "function": "ehci_hub_control",
+      "source_file": "drivers/usb/host/ehci-hub.c",
+      "lock_source_line": 1081,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s6557",
+      "mutex_name": "%4",
+      "function": "ohci_suspend",
+      "source_file": "drivers/usb/host/ohci-hcd.c",
+      "lock_source_line": 1108,
+      "unlock_source_lines": [
+        418
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s6715",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "i8042_flush",
+      "source_file": "drivers/input/serio/i8042.c",
+      "lock_source_line": 271,
+      "unlock_source_lines": [
+        418,
+        418,
+        418
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s6720",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "i8042_kbd_write",
+      "source_file": "drivers/input/serio/i8042.c",
+      "lock_source_line": 367,
+      "unlock_source_lines": [
+        418,
+        418
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s6881",
+      "mutex_name": "%423",
+      "function": "ptp_ioctl",
+      "source_file": "drivers/ptp/ptp_chardev.c",
+      "lock_source_line": 383,
+      "unlock_source_lines": [
+        386
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s6939",
+      "mutex_name": "@thermal_hwmon_list_lock",
+      "function": "thermal_hwmon_lookup_temp",
+      "source_file": "drivers/thermal/thermal_hwmon.c",
+      "lock_source_line": 115,
+      "unlock_source_lines": [
+        0,
+        0,
+        0
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7126",
+      "mutex_name": "@cpufreq_driver_lock",
+      "function": "cpufreq_unregister_driver",
+      "source_file": "drivers/cpufreq/cpufreq.c",
+      "lock_source_line": 2880,
+      "unlock_source_lines": [
+        2884
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7182",
+      "mutex_name": "@intel_pstate_driver_lock",
+      "function": "show_status",
+      "source_file": "drivers/cpufreq/intel_pstate.c",
+      "lock_source_line": 1147,
+      "unlock_source_lines": [
+        1149
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7197",
+      "mutex_name": "@cpuidle_lock",
+      "function": "show_current_governor",
+      "source_file": "drivers/cpuidle/sysfs.c",
+      "lock_source_line": 66,
+      "unlock_source_lines": [
+        71,
+        71
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s7325",
+      "mutex_name": "@con_mutex",
+      "function": "mbox_request_channel",
+      "source_file": "drivers/mailbox/mailbox.c",
+      "lock_source_line": 345,
+      "unlock_source_lines": [
+        350
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s7355",
+      "mutex_name": "@snd_card_mutex",
+      "function": "snd_card_ref",
+      "source_file": "sound/core/init.c",
+      "lock_source_line": 346,
+      "unlock_source_lines": [
+        350,
+        350
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7465",
+      "mutex_name": "%7",
+      "function": "snd_timer_user_ioctl",
+      "source_file": "sound/core/timer.c",
+      "lock_source_line": 2128,
+      "unlock_source_lines": [
+        2130
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7517",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "snd_seq_client_use_ptr",
+      "source_file": "sound/core/seq/seq_clientmgr.c",
+      "lock_source_line": 152,
+      "unlock_source_lines": [
+        0,
+        0
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s7547",
+      "mutex_name": "%struct.raw_spinlock",
+      "function": "queueptr",
+      "source_file": "sound/core/seq/seq_queue.c",
+      "lock_source_line": 210,
+      "unlock_source_lines": [
+        418,
+        418
+      ],
+      "reasons": [
+        "READ_ONLY"
+      ]
+    },
+    {
+      "id": "s7665",
+      "mutex_name": "%2",
+      "function": "sock_orphan",
+      "source_file": "./include/net/sock.h",
+      "lock_source_line": 1936,
+      "unlock_source_lines": [
+        1940
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7703",
+      "mutex_name": "@pernet_ops_rwsem",
+      "function": "net_ns_barrier",
+      "source_file": "net/core/net_namespace.c",
+      "lock_source_line": 625,
+      "unlock_source_lines": [
+        626
+      ],
+      "reasons": [
+        "EMPTY_CS"
+      ]
+    },
+    {
+      "id": "s7788",
+      "mutex_name": "@sock_diag_table_mutex",
+      "function": "sock_diag_unregister_inet_compat",
+      "source_file": "net/core/sock_diag.c",
+      "lock_source_line": 175,
+      "unlock_source_lines": [
+        177
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7790",
+      "mutex_name": "@sock_diag_table_mutex",
+      "function": "sock_diag_register_inet_compat",
+      "source_file": "net/core/sock_diag.c",
+      "lock_source_line": 167,
+      "unlock_source_lines": [
+        169
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7910",
+      "mutex_name": "%2",
+      "function": "sock_orphan.100725",
+      "source_file": "./include/net/sock.h",
+      "lock_source_line": 1936,
+      "unlock_source_lines": [
+        1940
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7923",
+      "mutex_name": "@nf_log_mutex",
+      "function": "nf_log_unset",
+      "source_file": "net/netfilter/nf_log.c",
+      "lock_source_line": 68,
+      "unlock_source_lines": [
+        74,
+        74
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7925",
+      "mutex_name": "@nf_log_mutex",
+      "function": "nf_log_unbind_pf",
+      "source_file": "net/netfilter/nf_log.c",
+      "lock_source_line": 148,
+      "unlock_source_lines": [
+        150
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7977",
+      "mutex_name": "@nf_ct_proto_mutex",
+      "function": "nf_ct_bridge_unregister",
+      "source_file": "net/netfilter/nf_conntrack_proto.c",
+      "lock_source_line": 643,
+      "unlock_source_lines": [
+        645
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s7978",
+      "mutex_name": "@nf_ct_proto_mutex",
+      "function": "nf_ct_bridge_register",
+      "source_file": "net/netfilter/nf_conntrack_proto.c",
+      "lock_source_line": 634,
+      "unlock_source_lines": [
+        636
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8048",
+      "mutex_name": "%2",
+      "function": "sock_orphan.103622",
+      "source_file": "./include/net/sock.h",
+      "lock_source_line": 1936,
+      "unlock_source_lines": [
+        1940
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8057",
+      "mutex_name": "%2",
+      "function": "sock_orphan.103840",
+      "source_file": "./include/net/sock.h",
+      "lock_source_line": 1936,
+      "unlock_source_lines": [
+        1940
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8280",
+      "mutex_name": "%2",
+      "function": "sock_orphan.108843",
+      "source_file": "./include/net/sock.h",
+      "lock_source_line": 1936,
+      "unlock_source_lines": [
+        1940
+      ],
+      "reasons": [
+        "LOCAL_VARS",
+        "REDUNDANT"
+      ]
+    },
+    {
+      "id": "s8523",
+      "mutex_name": "%2",
+      "function": "sock_orphan.112831",
+      "source_file": "./include/net/sock.h",
+      "lock_source_line": 1936,
+      "unlock_source_lines": [
+        1940
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8563",
+      "mutex_name": "%17",
+      "function": "xs_tcp_finish_connecting",
+      "source_file": "net/sunrpc/xprtsock.c",
+      "lock_source_line": 2197,
+      "unlock_source_lines": [
+        2217
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8577",
+      "mutex_name": "%11",
+      "function": "xs_udp_finish_connecting",
+      "source_file": "net/sunrpc/xprtsock.c",
+      "lock_source_line": 2034,
+      "unlock_source_lines": [
+        2051
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8585",
+      "mutex_name": "%11",
+      "function": "xs_local_finish_connecting",
+      "source_file": "net/sunrpc/xprtsock.c",
+      "lock_source_line": 1836,
+      "unlock_source_lines": [
+        1852
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8664",
+      "mutex_name": "%5",
+      "function": "rpc_get_sb_net",
+      "source_file": "net/sunrpc/rpc_pipe.c",
+      "lock_source_line": 1229,
+      "unlock_source_lines": [
+        1232
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8716",
+      "mutex_name": "%2",
+      "function": "get_gssp_clnt",
+      "source_file": "net/sunrpc/auth_gss/gss_rpc_upcall.c",
+      "lock_source_line": 160,
+      "unlock_source_lines": [
+        164,
+        164
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8885",
+      "mutex_name": "%12",
+      "function": "ieee80211_del_virtual_monitor",
+      "source_file": "net/mac80211/iface.c",
+      "lock_source_line": 1003,
+      "unlock_source_lines": [
+        1008,
+        1013
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8954",
+      "mutex_name": "%2",
+      "function": "ieee80211_clear_fast_rx",
+      "source_file": "./include/linux/spinlock.h",
+      "lock_source_line": 368,
+      "unlock_source_lines": [
+        408
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    },
+    {
+      "id": "s8975",
+      "mutex_name": "%2",
+      "function": "ieee80211_clear_fast_xmit",
+      "source_file": "./include/linux/spinlock.h",
+      "lock_source_line": 368,
+      "unlock_source_lines": [
+        408
+      ],
+      "reasons": [
+        "LOCAL_VARS"
+      ]
+    }
+  ],
+  "warnings": [
+    "1983 sites contain unresolved indirect calls (CHA fallback applied)."
+  ]
+}

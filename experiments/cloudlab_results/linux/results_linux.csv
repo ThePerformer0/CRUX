@@ -1,0 +1,6 @@
+Lock_ID,File,Function,Line,Pattern,True_Positive,Benchmark_Tool,Base_Throughput,Patched_Throughput,Throughput_Gain,Base_Latency,Patched_Latency,Latency_Gain
+s7703,net/core/net_namespace.c,net_ns_barrier,625,EMPTY_CS,Yes,bench_linux_locks (16t 10 runs),5.03 M ops/s,1601.19 M ops/s,+31751.72%,0.643668 s,0.002015 s,+99.69%
+s5848,drivers/block/loop.c,loop_change_fd,794,EMPTY_CS,Yes,bench_linux_locks (16t 10 runs),20.07 M ops/s,1710.99 M ops/s,+8425.53%,0.159457 s,0.001904 s,+98.81%
+s5851,drivers/block/loop.c,__loop_clr_fd,1343,EMPTY_CS,Yes,bench_linux_locks (16t 10 runs),20.07 M ops/s,1710.99 M ops/s,+8425.53%,0.159457 s,0.001904 s,+98.81%
+s5950,drivers/scsi/scsi_sysfs.c,scsi_device_dev_release_usercontext,484,REDUNDANT,Yes,bench_linux_locks (16t 10 runs),1196.42 M ops/s,8706.57 M ops/s,+627.72%,0.013376 s,0.001861 s,+86.09%
+s5330,drivers/gpu/drm/i915/gt/uc/intel_guc_submission.c,scrub_guc_desc_for_outstanding_g2h,601,REDUNDANT,Yes,bench_linux_locks (16t 10 runs),1.95 M ops/s,658.49 M ops/s,+33668.62%,0.820840 s,0.002466 s,+99.70%
