@@ -4,7 +4,7 @@
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![LLVM IR](https://img.shields.io/badge/LLVM%20IR-14.0%2B-red.svg)](https://llvm.org/)
 [![SMT Solver](https://img.shields.io/badge/SMT-Z3%20Solver-green.svg)](https://github.com/Z3Prover/z3)
-[![Test Suite](https://img.shields.io/badge/Tests-Pytest%20Passing-brightgreen.svg)](tests/)
+[![Test Suite](https://img.shields.io/badge/Tests-92%20Passing-brightgreen.svg)](tests/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Artifact Evaluation](https://img.shields.io/badge/Artifact-Ready%20for%20Review-purple.svg)](experiments/)
 
@@ -55,6 +55,8 @@ python crux.py tests/integration/test_read_only.ll -v
 ```bash
 pytest tests/ -v --tb=short
 ```
+
+The suite comprises **92 tests** across unit and integration levels, including 8 dedicated tests for the `SINGLE_THREAD` anti-pattern detection logic (`_mark_single_thread_sites`).
 
 ---
 

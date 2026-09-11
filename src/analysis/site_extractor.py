@@ -3,6 +3,10 @@
 Identifies lock acquisition calls, traces critical sections to their matching unlock calls,
 and computes direct/transitive memory reads, writes, indirect call flags, path conditions,
 and entry locksets for each LockSite object.
+
+Also detects SINGLE_THREAD sites: functions that are never transitively reached from a
+pthread_create (or equivalent) thread-entry callback belong to the sequential phase of
+the program and do not need mutual exclusion.
 """
 
 import re
@@ -20,6 +24,22 @@ ATOMIC_VAR_PATTERN = re.compile(r"(?:atomicrmw|cmpxchg)\s+.*?(%[a-zA-Z0-9_$.]+|@
 MEMCPY_PATTERN = re.compile(r"@llvm\.mem(?:cpy|move)[a-zA-Z0-9_$.]*\s*\(\s*(?:ptr|i8\*|[a-zA-Z0-9_*]+)\s*(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)\s*,\s*(?:ptr|i8\*|[a-zA-Z0-9_*]+)\s*(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
 MEMSET_PATTERN = re.compile(r"@llvm\.memset[a-zA-Z0-9_$.]*\s*\(\s*(?:ptr|i8\*|[a-zA-Z0-9_*]+)\s*(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
 CALL_TARGET_PATTERN = re.compile(r"(?:call|invoke)\s+.*@([a-zA-Z0-9_$.]+)\s*\(")
+
+# Thread creation APIs: the first or second argument is the thread entry function pointer.
+# We scan the raw IR for these patterns to discover thread entry points.
+THREAD_CREATE_FUNCTIONS: set = {
+    "pthread_create",          # POSIX
+    "thrd_create",             # C11 threads
+    "clone",                   # Linux kernel raw clone
+    "kthread_create",          # Linux kthread
+    "kthread_run",             # Linux kthread helper
+    "opal_thread_start",       # OpenMPI
+    "uv_thread_create",        # libuv
+}
+
+THREAD_ENTRY_ARG_PATTERN = re.compile(
+    r"(?:call|invoke)\s+.*@(?:" + r"|".join(THREAD_CREATE_FUNCTIONS) + r")\s*\(.*?@([a-zA-Z0-9_$.]+)"
+)
 
 
 class SiteExtractor:
@@ -88,7 +108,60 @@ class SiteExtractor:
         for site in all_sites:
             self._compute_transitive_effects(site)
 
+        # Step 3: Mark sites in the single-threaded execution phase
+        self._mark_single_thread_sites(all_sites, cfgs)
+
         return all_sites
+
+    def _mark_single_thread_sites(self, sites: list, cfgs: dict) -> None:
+        """Marks LockSite objects as single-threaded if they are never reachable from
+        a thread entry function passed to pthread_create or equivalent.
+
+        Strategy:
+          1. Scan ALL instructions across all CFGs for thread-creation calls.
+          2. Extract the function pointer argument (the thread entry function).
+          3. Compute the set of all functions transitively reachable from any thread entry.
+          4. Any site whose containing function is NOT in that reachable set is single-threaded.
+
+        Conservative assumption: if no pthread_create is found at all (e.g. single-threaded
+        program compiled with pthreads), we do NOT mark any site as SINGLE_THREAD.
+        """
+        thread_entry_functions: set = set()
+
+        # Pass 1: find all thread entry points
+        for func_name, cfg in cfgs.items():
+            for block in cfg.blocks.values():
+                for inst in block.instructions:
+                    raw = inst.raw.strip()
+                    if not ("call " in raw or "invoke " in raw):
+                        continue
+                    for create_func in THREAD_CREATE_FUNCTIONS:
+                        if f"@{create_func}" in raw:
+                            # Extract the thread function argument (typically 3rd arg for pthread_create)
+                            m = THREAD_ENTRY_ARG_PATTERN.search(raw)
+                            if m:
+                                thread_entry_functions.add(m.group(1))
+                            # Also scan for any @function_name reference in the args
+                            # (handles direct function pointer passing)
+                            all_refs = re.findall(r"@([a-zA-Z0-9_$.]+)", raw)
+                            for ref in all_refs:
+                                if ref != create_func and ref in cfgs:
+                                    thread_entry_functions.add(ref)
+
+        # If no thread creation found, conservatively skip (all locks may be necessary)
+        if not thread_entry_functions:
+            return
+
+        # Pass 2: compute all functions reachable from any thread entry point
+        threaded_functions: set = set(thread_entry_functions)
+        for entry in thread_entry_functions:
+            reachable = self.call_graph.get_transitive_callees(entry)
+            threaded_functions.update(reachable)
+
+        # Pass 3: mark sites whose function is NOT reachable from any thread
+        for site in sites:
+            if site.function not in threaded_functions:
+                site.is_single_thread = True
 
     def _is_lock_call(self, raw_line: str) -> bool:
         if "call " not in raw_line and "invoke " not in raw_line:
