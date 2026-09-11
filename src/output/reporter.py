@@ -63,7 +63,9 @@ def generate_report(sites: List[LockSite], lsg: LockSiteGraph,
             "source_file": s.source_file,
             "lock_source_line": s.lock_source_line,
             "unlock_source_lines": s.unlock_source_lines,
-            "reasons": s.reasons
+            "reasons": s.reasons,
+            "confidence_score": round(s.confidence_score, 2),
+            "suggested_fix": s.suggested_fix,
         })
 
     warnings: List[str] = []

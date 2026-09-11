@@ -44,3 +44,7 @@ def test_json_reporter_format():
     assert report["summary"]["useless_sites"] == 1
     assert len(report["useless_sites"]) == 1
     assert report["useless_sites"][0]["id"] == "s1"
+    assert "confidence_score" in report["useless_sites"][0]
+    assert isinstance(report["useless_sites"][0]["confidence_score"], float)
+    assert "suggested_fix" in report["useless_sites"][0]
+    assert "vide" in report["useless_sites"][0]["suggested_fix"]
