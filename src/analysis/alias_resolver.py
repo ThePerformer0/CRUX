@@ -47,6 +47,7 @@ GEP_PATTERN = re.compile(r"getelementptr\s+.*,\s*.*?\*\s*(%[a-zA-Z0-9_$.]+|@[a-z
 BITCAST_PATTERN = re.compile(r"bitcast\s+.*?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)\s+to")
 LOAD_PTR_PATTERN = re.compile(r"load\s+.*,\s*.*?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
 STORE_PTR_PATTERN = re.compile(r"store\s+.*?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)\s*,\s*.*?(%[a-zA-Z0-9_$.]+|@[a-zA-Z0-9_$.]+)")
+TLS_GLOBAL_PATTERN = re.compile(r"^(@[a-zA-Z0-9_$.]+)\s*=.*?\bthread_local(?:\([a-zA-Z0-9_]+\))?\b.*?\b(?:global|constant)\b")
 
 
 class AliasResolver:
@@ -57,6 +58,16 @@ class AliasResolver:
         self.gep_map: Dict[str, Tuple[str, str]] = {}  # reg -> (base_reg, field_index)
         self.points_to: Dict[str, str] = {}  # ptr_reg -> stored_val_reg
         self.stack_allocas: Set[str] = set()  # set of registers allocated on the stack (alloca)
+        self.tls_globals: Set[str] = set()  # set of explicit thread_local global variables
+
+    def parse_tls_globals(self, llvm_ir_text: str) -> None:
+        """Extracts all thread_local global variable declarations from LLVM IR text."""
+        for line in llvm_ir_text.splitlines():
+            line_str = line.strip()
+            if "thread_local" in line_str and line_str.startswith("@"):
+                m = TLS_GLOBAL_PATTERN.search(line_str)
+                if m:
+                    self.tls_globals.add(m.group(1))
 
     def analyze_cfgs(self, cfgs: Dict[str, CFG]) -> None:
         """Analyzes all instructions across CFGs to populate alias equivalence classes.
@@ -71,6 +82,7 @@ class AliasResolver:
 
     def analyze_ir(self, llvm_ir_text: str) -> None:
         """Utility method to parse LLVM IR text and analyze alias relations."""
+        self.parse_tls_globals(llvm_ir_text)
         cfgs = build_cfgs(llvm_ir_text)
         self.analyze_cfgs(cfgs)
 
@@ -160,12 +172,25 @@ class AliasResolver:
             return True
         return clean.startswith("%") and not clean.startswith("@")
 
+    def is_tls(self, var_name: str) -> bool:
+        """Determines if a variable identifier originates from an explicit thread_local global."""
+        clean = var_name.split("::")[-1].strip()
+        if not clean.startswith("@"):
+            return False
+        base_part = clean.split(".")[0] if "." in clean else clean
+        root = self.uf.find(base_part)
+        return (root in self.tls_globals or 
+                base_part in self.tls_globals or 
+                clean in self.tls_globals)
+
     def is_thread_local(self, canonical_id: str) -> bool:
-        """Determines if a canonical variable identifier is guaranteed thread-local (e.g. stack alloca)."""
-        clean = canonical_id.strip()
-        if clean.startswith("@"):
-            return False  # Global variable
-        return True
+        """Determines if a canonical variable identifier is guaranteed thread-local (stack alloca or TLS)."""
+        clean = canonical_id.split("::")[-1].strip()
+        if self.is_tls(clean):
+            return True
+        if self.is_stack_alloca(clean):
+            return True
+        return False
 
     def get_canonical_id(self, reg: str, visited: Optional[Set[str]] = None) -> str:
         """Returns the canonical identifier for a register or variable string.

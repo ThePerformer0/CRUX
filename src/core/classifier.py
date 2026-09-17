@@ -53,6 +53,13 @@ class Classifier:
             return self.alias_resolver.is_stack_alloca(clean)
         return is_stack_local(clean)
 
+    def _is_tls(self, var_name: str) -> bool:
+        """Returns True only if var_name originates from an explicit LLVM thread_local global."""
+        clean = var_name.split("::")[-1].strip()
+        if self.alias_resolver is not None:
+            return self.alias_resolver.is_tls(clean)
+        return False
+
     def classify_site(self, site: LockSite) -> List[str]:
         """Evaluates a LockSite and returns a list of applicable anti-pattern reasons.
 
@@ -93,14 +100,21 @@ class Classifier:
 
         # Pattern 3: READ_ONLY
         elif all_vars and not all_writes and not effective_conflict and not site.has_indirect_calls:
-            reasons.append("READ_ONLY")
+            # If all accessed variables are TLS globals, THREAD_LOCAL is the primary structural cause.
+            if any(self._is_tls(v) for v in all_vars) and all(self._is_tls(v) for v in all_vars):
+                reasons.append("THREAD_LOCAL")
+            else:
+                reasons.append("READ_ONLY")
 
         # Pattern 4: THREAD_LOCAL
-        # Only flag THREAD_LOCAL if the critical section has no writes (read-only unshared data)
-        # and has no SHARE conflict edges in the LSG.
-        # If the lock protects writes to non-stack memory, the lock is necessary.
-        elif all_vars and not all_writes and not effective_conflict and not site.has_indirect_calls and "READ_ONLY" not in reasons:
-            if not self.lsg.has_share_edge(site.site_id):
+        # A site is THREAD_LOCAL if its accessed variables are thread-private:
+        # (a) Explicit LLVM thread_local globals (TLS), where hardware/OS guarantees per-thread isolation, OR
+        # (b) Variables without concurrent conflict edges (SHARE) in the LSG across all threads.
+        elif (all_vars and not effective_conflict and not site.has_indirect_calls
+              and not site.has_inline_asm and not site.has_memory_intrinsic):
+            all_tls = all(self._is_tls(v) for v in all_vars)
+            unshared_data = not self.lsg.has_share_edge(site.site_id)
+            if all_tls or unshared_data:
                 reasons.append("THREAD_LOCAL")
 
 
@@ -165,9 +179,9 @@ class Classifier:
         if site.has_indirect_calls:
             filtered = [r for r in filtered if r in ("SINGLE_THREAD",)]
 
-        # Guard 2: Condition variable wait mutex -> discard EMPTY_CS, READ_ONLY, REDUNDANT
+        # Guard 2: Condition variable wait mutex -> discard EMPTY_CS, READ_ONLY, REDUNDANT, THREAD_LOCAL
         if site.is_cond_wait_mutex:
-            filtered = [r for r in filtered if r not in ("EMPTY_CS", "READ_ONLY", "REDUNDANT")]
+            filtered = [r for r in filtered if r not in ("EMPTY_CS", "READ_ONLY", "REDUNDANT", "THREAD_LOCAL")]
 
         # Guard 3: Recursive mutex -> discard REDUNDANT
         if site.mutex_is_recursive:

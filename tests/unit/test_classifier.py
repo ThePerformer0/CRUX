@@ -140,3 +140,69 @@ def test_classifier_guards_inline_asm():
     
     assert "LOCAL_VARS" not in reasons_fence
     assert site_fence.is_useless is False
+
+
+def test_classify_thread_local_tls_global():
+    """Verify lock site accessing an explicit thread_local global (even with writes) is classified as THREAD_LOCAL."""
+    site = LockSite(site_id="s1", mutex_canonical_id="%m", mutex_name="%m", function="worker",
+                    reads={"@tls_counter"}, writes={"@tls_counter"}, unlock_source_lines=[15])
+    lsg = LockSiteGraph()
+    lsg.build_graph([site])
+
+    classifier = Classifier(lsg)
+    # Simulate alias resolver identifying @tls_counter as explicit TLS global
+    mock_resolver = type('MockResolver', (), {
+        'is_stack_alloca': lambda self, v: False,
+        'is_tls': lambda self, v: v == "@tls_counter"
+    })()
+    classifier.alias_resolver = mock_resolver
+
+    reasons = classifier.classify_site(site)
+
+    assert "THREAD_LOCAL" in reasons
+    assert site.is_useless is True
+
+
+def test_classify_thread_local_unshared_data():
+    """Verify lock site writing to unshared non-stack memory with zero LSG conflict edges is classified as THREAD_LOCAL."""
+    site = LockSite(site_id="s1", mutex_canonical_id="%m", mutex_name="%m", function="worker_init",
+                    writes={"@worker_private_buf"}, unlock_source_lines=[20])
+    lsg = LockSiteGraph()
+    lsg.build_graph([site])
+
+    classifier = Classifier(lsg)
+    mock_resolver = type('MockResolver', (), {
+        'is_stack_alloca': lambda self, v: False,
+        'is_tls': lambda self, v: False
+    })()
+    classifier.alias_resolver = mock_resolver
+
+    reasons = classifier.classify_site(site)
+
+    assert "THREAD_LOCAL" in reasons
+    assert site.is_useless is True
+
+
+def test_classify_thread_local_contested_rejected():
+    """Verify lock site writing to data contested by another thread is NOT classified as THREAD_LOCAL."""
+    s1 = LockSite(site_id="s1", mutex_canonical_id="%m1", mutex_name="%m1", function="worker1",
+                  writes={"@shared_pool"}, unlock_source_lines=[10])
+    s2 = LockSite(site_id="s2", mutex_canonical_id="%m2", mutex_name="%m2", function="worker2",
+                  reads={"@shared_pool"}, unlock_source_lines=[25])
+    lsg = LockSiteGraph()
+    lsg.build_graph([s1, s2])
+
+    classifier = Classifier(lsg)
+    mock_resolver = type('MockResolver', (), {
+        'is_stack_alloca': lambda self, v: False,
+        'is_tls': lambda self, v: False
+    })()
+    classifier.alias_resolver = mock_resolver
+
+    reasons_s1 = classifier.classify_site(s1)
+    reasons_s2 = classifier.classify_site(s2)
+
+    assert "THREAD_LOCAL" not in reasons_s1
+    assert s1.is_useless is False
+    assert "THREAD_LOCAL" not in reasons_s2
+

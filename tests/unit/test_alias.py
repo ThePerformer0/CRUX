@@ -114,3 +114,26 @@ def test_select_aliasing():
     assert canon_res == resolver.get_canonical_id("%p1")
     assert canon_res == resolver.get_canonical_id("%p2")
 
+
+def test_tls_globals_detection():
+    """Verify thread_local global variables are properly identified as TLS."""
+    ir = """
+    @tls_var = thread_local global i32 0, align 4
+    @normal_global = global i32 0, align 4
+
+    define void @foo() {
+    entry:
+        %val = load i32, i32* @tls_var
+        ret void
+    }
+    """
+    resolver = AliasResolver()
+    resolver.analyze_ir(ir)
+
+    assert "@tls_var" in resolver.tls_globals
+    assert resolver.is_tls("@tls_var") is True
+    assert resolver.is_thread_local("@tls_var") is True
+    assert "@normal_global" not in resolver.tls_globals
+    assert resolver.is_tls("@normal_global") is False
+
+

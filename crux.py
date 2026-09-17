@@ -61,6 +61,7 @@ def main() -> None:
 
     # Pipeline Phase 3: Field-Based Alias Analyzer
     alias_resolver = AliasResolver()
+    alias_resolver.parse_tls_globals(llvm_ir_text)
     alias_resolver.analyze_cfgs(cfgs)
 
     # Pipeline Phase 4: Lockset Analyzer
