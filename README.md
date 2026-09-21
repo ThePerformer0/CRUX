@@ -19,8 +19,8 @@ Follow these steps to verify installation and run an immediate end-to-end analys
 ### 1.1 Installation
 
 ```bash
-# Clone the repository (or unpack the artifact archive)
-git clone <ANONYMIZED_REPO_URL>
+# Clone the repository
+git clone https://github.com/ThePerformer0/CRUX.git
 cd CRUX
 
 # Install lightweight dependencies (Python 3.9+, Z3, NetworkX, Pytest)
