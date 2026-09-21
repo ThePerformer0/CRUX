@@ -30,15 +30,15 @@ CRUX identified five superfluous synchronization sites in the Linux kernel spann
 ### Site 1: `net/core/net_namespace.c` (Line 625)
 * **Function:** `net_ns_barrier()`
 * **Pattern:** `EMPTY_CS` (Empty Critical Section)
-* **Diagnosis:** An empty mutex lock/unlock pair on `net_sem` executed as an ad-hoc flush barrier. Within the critical section, zero variables are read or written and no subroutines are invoked.
+* **Diagnosis:** An empty rwsem acquisition pair on `pernet_ops_rwsem` executed as a drain barrier. Within the critical section, zero variables are read or written and no subroutines are invoked.
 
 ```diff
 --- a/net/core/net_namespace.c
 +++ b/net/core/net_namespace.c
-@@ -622,7 +622,5 @@ static void net_ns_barrier(void)
+@@ -623,5 +623,3 @@ void net_ns_barrier(void)
  {
--	down_write(&net_sem);
--	up_write(&net_sem);
+-	down_write(&pernet_ops_rwsem);
+-	up_write(&pernet_ops_rwsem);
 +	/* Synchronous namespace lookup drain barrier elided */
  }
 ```
@@ -114,23 +114,41 @@ CRUX isolated two spinlocks in the Xen hypervisor executed during hardware trap 
 
 ## 3. PostgreSQL Database Server
 
-CRUX identified two lightweight locks (`LWLock`) in PostgreSQL's statistics infrastructure conforming to the `READ_ONLY` anti-pattern.
+CRUX identified two lightweight locks (`LWLock`) in PostgreSQL's statistics infrastructure conforming to the `READ_ONLY` anti-pattern: `pgstat_slru_snapshot_cb()` in `src/backend/utils/activity/pgstat_slru.c` (line 199) and `pgstat_wal_snapshot_cb()` in `src/backend/utils/activity/pgstat_wal.c` (line 173).
 
-### Sites 1 & 2: `pgstat_slru.c` (Line 207) & `pgstat_wal.c` (Line 182)
+### Sites 1 & 2: `pgstat_slru.c` & `pgstat_wal.c`
+* **Source Files:** `src/backend/utils/activity/pgstat_slru.c` and `src/backend/utils/activity/pgstat_wal.c`
 * **Functions:** `pgstat_slru_snapshot_cb()` and `pgstat_wal_snapshot_cb()`
 * **Pattern:** `READ_ONLY`
-* **Diagnosis:** Backend worker processes acquire a shared lock (`LWLockAcquire(..., LW_SHARED)`) simply to copy cumulative statistics blocks into local backend memory via `memcpy`. Removing lock contention eliminates multi-core cache-line bouncing.
+* **Diagnosis:** Backend worker processes acquire a shared lock (`LWLockAcquire(..., LW_SHARED)`) simply to copy cumulative statistics blocks (`pgStatLocal.shmem->wal` and `pgStatLocal.shmem->slru`) into local backend memory via `memcpy`. The critical section performs purely memory reads. Removing lock contention on these frequent snapshot calls completely eliminates multi-core cache-line bouncing.
 
+**Verbatim Patch on `pgstat_wal.c`:**
 ```diff
---- a/src/backend/postmaster/pgstat_wal.c
-+++ b/src/backend/postmaster/pgstat_wal.c
-@@ -180,7 +180,5 @@ void pgstat_wal_snapshot_cb(void)
+--- a/src/backend/utils/activity/pgstat_wal.c
++++ b/src/backend/utils/activity/pgstat_wal.c
+@@ -169,9 +169,7 @@ void pgstat_wal_snapshot_cb(void)
  {
--    LWLockAcquire(&pgStatLocal.shmem->lock, LW_SHARED);
-     memcpy(&pgStatLocal.snapshot.wal,
-            &pgStatLocal.shmem->stats.wal,
-            sizeof(PgStat_WalStats));
--    LWLockRelease(&pgStatLocal.shmem->lock);
+ 	PgStatShared_Wal *stats_shmem = &pgStatLocal.shmem->wal;
+
+-	LWLockAcquire(&stats_shmem->lock, LW_SHARED);
+ 	memcpy(&pgStatLocal.snapshot.wal, &stats_shmem->stats,
+ 		   sizeof(pgStatLocal.snapshot.wal));
+-	LWLockRelease(&stats_shmem->lock);
+ }
+```
+
+**Verbatim Patch on `pgstat_slru.c`:**
+```diff
+--- a/src/backend/utils/activity/pgstat_slru.c
++++ b/src/backend/utils/activity/pgstat_slru.c
+@@ -195,9 +195,7 @@ void pgstat_slru_snapshot_cb(void)
+ {
+ 	PgStatShared_SLRU *stats_shmem = &pgStatLocal.shmem->slru;
+
+-	LWLockAcquire(&stats_shmem->lock, LW_SHARED);
+ 	memcpy(pgStatLocal.snapshot.slru, &stats_shmem->stats,
+ 		   sizeof(stats_shmem->stats));
+-	LWLockRelease(&stats_shmem->lock);
  }
 ```
 

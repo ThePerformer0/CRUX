@@ -6,15 +6,15 @@
 [![SMT Solver](https://img.shields.io/badge/SMT-Z3%20Solver-green.svg)](https://github.com/Z3Prover/z3)
 [![Test Suite](https://img.shields.io/badge/Tests-96%20Passing-brightgreen.svg)](tests/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Artifact Evaluation](https://img.shields.io/badge/Artifact-Ready%20for%20Review-purple.svg)](experiments/)
+[![Documentation](https://img.shields.io/badge/Docs-Formal%20Spec-blue.svg)](docs/formal_specification.md)
 
 CRUX is an LLVM IR-level static analyzer designed to identify unnecessary, redundant, and semantically superfluous synchronization primitives (mutexes, spinlocks, rwlocks) in multi-threaded C/C++ systems software, including libraries, database engines, web servers, hypervisors, and operating system kernels.
 
 ---
 
-## 1. Quickstart & Kick-the-Tires (2-Minute Sanity Check)
+## 1. Quickstart & Sanity Check (2 Minutes)
 
-For reviewers and users evaluating the artifact, follow these steps to verify installation and run an immediate end-to-end analysis on an included LLVM IR benchmark in under two minutes:
+Follow these steps to verify installation and run an immediate end-to-end analysis on an included LLVM IR benchmark in under two minutes:
 
 ### 1.1 Installation
 
@@ -173,24 +173,7 @@ While frontier LLMs excel at syntax-level scoping (100% on Levels 0–2), they s
 
 ---
 
-## 7. Paper-to-Artifact Mapping (Artifact Evaluation)
-
-To facilitate artifact evaluation by peer reviewers, the table below maps claims, tables, and figures from the research paper directly to artifacts within this repository:
-
-| Paper Element | Description | Corresponding Repository Artifact |
-|---|---|---|
-| **Section 3 / Formal Model** | Mathematical definitions of LSG, inference rules, and safety guards | [`docs/formal_specification.md`](docs/formal_specification.md) |
-| **Section 4 / Implementation** | Core static analysis engine (CFG, Lockset, LSG, Z3 SMT) | [`src/`](src/) and [`crux.py`](crux.py) |
-| **Section 5.1 / Table 1** | Real-world static analysis results on 17 production targets | [`experiments/cloudlab_results/`](experiments/cloudlab_results/) |
-| **Section 5.2 / Table 2** | Historical Ground-Truth Validation (5 mined production commits) | [`experiments/commit_mining/ground_truth_index.json`](experiments/commit_mining/ground_truth_index.json) |
-| **Section 5.3 / Figures 1–4** | Performance impact of lock elision (Memcached, PostgreSQL, Xen, Linux) | [`experiments/cloudlab_results/`](experiments/cloudlab_results/) |
-| **Section 5.4 / Table 3** | Exploratory LLM study on 15 concurrency test cases (Claude, Gemini, GPT) | [`experiments/llm_evaluation/README.md`](experiments/llm_evaluation/README.md) |
-| **Section 6 / Discussion** | Empirical audit of 60 candidate sites & False Positive taxonomy | [`experiments/false_positive_study/study_report.md`](experiments/false_positive_study/study_report.md) |
-| **Sanity Check Fixtures** | Minimal `.ll` bitcode cases reproducing each anti-pattern | [`tests/integration/`](tests/integration/) |
-
----
-
-## 8. Analyzing Custom C/C++ Code
+## 7. Analyzing Custom C/C++ Code
 
 To analyze your own C/C++ software with CRUX, compile source files into textual LLVM IR (`.ll`) using Clang:
 
@@ -216,7 +199,7 @@ python crux.py <path_to_ir.ll> \
 
 ---
 
-## 9. Repository Structure
+## 8. Repository Structure
 
 ```text
 CRUX/
@@ -242,22 +225,7 @@ CRUX/
 
 ---
 
-## 10. Citation
-
-If you use CRUX, its theoretical framework, or its experimental benchmarks in your research, please cite our work:
-
-```bibtex
-@inproceedings{crux2026uselesslocks,
-  author    = {Anonymous Authors},
-  title     = {CRUX: Sound Static Extraction of Superfluous Synchronization in Systems Software},
-  booktitle = {Proceedings of the International Conference on Systems and Software},
-  year      = {2026}
-}
-```
-
----
-
-## 11. License
+## 9. License
 
 This project is licensed under the [Apache License 2.0](LICENSE).
 
