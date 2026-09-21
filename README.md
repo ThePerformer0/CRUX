@@ -76,36 +76,14 @@ For rigorous mathematical proofs, inference rules, and soundness bounds, refer t
 
 ## 3. Pipeline Architecture
 
-```text
-[ LLVM IR (.ll / .bc) ]
-         │
-         ▼
- 1. Call Graph Builder       ── Interprocedural call tree with CHA fallback
-         │
-         ▼
- 2. CFG Builder              ── Flow-sensitive per-function basic block control graphs
-         │
-         ▼
- 3. Field-Based Alias        ── Union-Find canonical memory register mapping
-         │
-         ▼
- 4. BFS Lockset Analyzer     ── Fixed-point dataflow tracking held locks per instruction
-         │
-         ▼
- 5. Site Characterizer       ── Direct/transitive read/write sets & path conditions
-         │
-         ▼
- 6. LSG Builder              ── Multi-relational graph (SHARE, NEST, HB edges)
-         │
-         ▼
- 7. Anti-Pattern Classifier  ── Evaluates 6 anti-patterns with 4 safety guards
-         │
-         ▼
- 8. Z3 SMT Validator         ── Prunes UNSAT path condition false positives
-         │
-         ▼
- 9. Scorer & Reporter        ── Confidence scoring [0.0 - 1.0] and structured JSON output
-```
+![CRUX Architectural Pipeline](docs/figures/crux_pipeline.png)
+
+The CRUX analysis pipeline operates in five cohesive phases:
+1. **Frontend & Control-Flow Ingestion:** Parses LLVM IR (`.ll`/`.bc`), resolves function call trees with Class Hierarchy Analysis (CHA) fallback, and builds intra-procedural CFGs.
+2. **Lockset & Alias Analysis:** Computes fixed-point dataflow locksets per instruction coupled with field-sensitive Union-Find pointer aliasing.
+3. **Lock Site Graph (LSG) Construction:** Synthesizes the multi-relational graph $G = (\mathcal{S}, \mathcal{A})$ across conflict (`SHARE`), nesting (`NEST`), and order (`HB`) relations.
+4. **Anti-Pattern Classification & Safety Guards:** Matches lock candidates against the 6 formal rules while enforcing strict soundness guards.
+5. **Z3 SMT Verification & Reporting:** Validates path feasibility via symbolic SMT solving, pruning dead/infeasible paths (`UNSAT`) before generating scored JSON reports.
 
 ---
 
