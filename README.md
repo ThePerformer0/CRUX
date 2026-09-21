@@ -4,7 +4,7 @@
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
 [![LLVM IR](https://img.shields.io/badge/LLVM%20IR-14.0%2B-red.svg)](https://llvm.org/)
 [![SMT Solver](https://img.shields.io/badge/SMT-Z3%20Solver-green.svg)](https://github.com/Z3Prover/z3)
-[![Test Suite](https://img.shields.io/badge/Tests-92%20Passing-brightgreen.svg)](tests/)
+[![Test Suite](https://img.shields.io/badge/Tests-96%20Passing-brightgreen.svg)](tests/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Artifact Evaluation](https://img.shields.io/badge/Artifact-Ready%20for%20Review-purple.svg)](experiments/)
 
@@ -19,8 +19,8 @@ For reviewers and users evaluating the artifact, follow these steps to verify in
 ### 1.1 Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/ThePerformer0/CRUX.git
+# Clone the repository (or unpack the artifact archive)
+git clone <ANONYMIZED_REPO_URL>
 cd CRUX
 
 # Install lightweight dependencies (Python 3.9+, Z3, NetworkX, Pytest)
@@ -40,13 +40,14 @@ python crux.py tests/integration/test_read_only.ll -v
 ======================================================================
   CRUX Analysis Summary -- tests/integration/test_read_only.ll
 ======================================================================
-  Total Lock Sites    : 1
-  Useless Sites (Safe): 1
+  Total Lock Sites    : 2
+  Useless Sites (Safe): 2
   Useful Sites (Kept) : 0
   Analysis Time       : ~0.02s
 ----------------------------------------------------------------------
   Detected Useless Locks:
-    * [site_0] worker(): line 14 -> READ_ONLY (mutex: data_mutex)
+    * [s1] reader1(): line 5 -> READ_ONLY (mutex: %m1)
+    * [s2] reader2(): line 13 -> READ_ONLY (mutex: %m2)
 ======================================================================
 ```
 
@@ -56,14 +57,14 @@ python crux.py tests/integration/test_read_only.ll -v
 pytest tests/ -v --tb=short
 ```
 
-The suite comprises **92 tests** across unit and integration levels, including 8 dedicated tests for the `SINGLE_THREAD` anti-pattern detection logic (`_mark_single_thread_sites`).
+The suite comprises **96 tests** across unit and integration levels, including 8 dedicated tests for the `SINGLE_THREAD` anti-pattern detection logic (`_mark_single_thread_sites`).
 
 ---
 
 ## 2. Key Features & Theoretical Foundations
 
 *   **LLVM IR Level Analysis**: Operates directly on textual `.ll` and bitcode `.bc` representations, making analysis fully language-agnostic across C and C++.
-*   **Lock Site Graph (LSG)**: Constructs a novel multi-directed graph $G = (S, A)$ capturing data sharing conflicts (`SHARE`), hierarchical nesting relationships (`NEST`), and static happens-before phase orderings (`HB`).
+*   **Lock Site Graph (LSG)**: Constructs a multi-directed graph $G = (\mathcal{S}, \mathcal{A})$ capturing data sharing conflicts (`SHARE`), hierarchical nesting relationships (`NEST`), and static happens-before phase orderings (`HB`).
 *   **6 Formal Anti-Patterns**: Detects `EMPTY_CS`, `LOCAL_VARS`, `READ_ONLY`, `REDUNDANT`, `SINGLE_THREAD`, and `THREAD_LOCAL` using conservative confidence scoring.
 *   **4 Strict Soundness Guards**: Built-in safety guards preventing unsound lock removal around indirect function calls, condition variable predicates (`pthread_cond_wait`), recursive mutexes, and asynchronous/escaping locks.
 *   **SMT Path Feasibility (Z3)**: Employs symbolic path condition solving to prune dead-code false positives and prove lock unreachability.
@@ -124,23 +125,32 @@ For rigorous mathematical proofs, inference rules, and soundness bounds, refer t
 ## 5. Large-Scale Empirical Evaluation (CloudLab)
 
 CRUX was evaluated on **17 real-world open-source C/C++ projects** deployed on a dedicated bare-metal server on **CloudLab**:
-* **Hardware:** Dual Intel Xeon Gold 6338 (20 cores, 40 hardware threads @ 2.00 GHz), 192 GB DDR4 RAM.
+* **Hardware:** AMD EPYC 7402P (24 physical cores, 48 vCPUs @ 2.80 GHz), 128 GB DDR4 RAM.
 * **OS & Toolchain:** Ubuntu 22.04 LTS (Linux Kernel 5.15), Clang 14.0.0 with WLLVM.
 
 ### Evaluated Production Systems (17 Targets)
 
 | Domain | Systems Evaluated |
 |---|---|
-| **OS Kernels & Hypervisors** | Linux Kernel 5.15 (`drivers/`), Xen Hypervisor |
+| **OS Kernels & Hypervisors** | Linux Kernel 5.15 (`drivers/`, `net/`, `mm/`), Xen Hypervisor |
 | **Databases & Key-Value Stores** | PostgreSQL, MySQL Server, Redis, Memcached, SQLite3, RocksDB |
 | **Web Servers & Proxies** | Nginx, HAProxy, Apache HTTPD, Lighttpd, H2O, Varnish Cache |
 | **HPC & Distributed Messaging** | OpenMPI, librdkafka, BusyBox |
 
-### Hardware Scalability Impact
+### Performance Evaluation Modalities & Identified Locks
 
-When redundant or useless locks remain in multi-threaded code, they cause severe cache-line bouncing and millions of kernel `futex` context switches. CloudLab hardware measurements across 1 to 32 worker threads demonstrated throughput collapses of **up to >95%** in contended workloads when useless locks are missed.
+We evaluated the performance impact of removing identified redundant locks across four representative systems under two evaluation modalities:
+1. **End-to-End Network Macro-benchmark (Memcached):** Tested under realistic network traffic using `memtier_benchmark` (200 concurrent connections across 4 client threads, 10 runs of 1M requests). Removing 3 thread-local locks yields **+21.3%** higher throughput and an **-87.3%** drop in P99 tail latency (from 8.58 ms to 1.09 ms).
+2. **Subsystem Isolation Benchmarks (PostgreSQL, Xen, Linux):** In complex operating systems and database engines, full-system end-to-end benchmarks are heavily dominated by disk I/O and memory paging, masking lock contention. We isolated the targeted subsystems under saturating parallel workloads (16 concurrent threads pinned to 16 physical cores) to directly measure the elimination of atomic bus locking (`LOCK CMPXCHG`) and cache-line bouncing.
 
-*Detailed per-project reports, CSV logs, and reproduction benchmarks are available in [`experiments/cloudlab_results/`](experiments/cloudlab_results/).*
+| System | Target Subsystem / File | Pattern | Baseline Perf | Patched Perf | Speedup / Gain |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **Memcached** | `thread.c:976`, `cache.c:69,109` | `LOCAL_VARS` | 231.1 K req/s | 280.2 K req/s | **+21.3% throughput**, **-87.3% P99** |
+| **PostgreSQL** | `pgstat_slru.c:207`, `pgstat_wal.c:182` | `READ_ONLY` | 6.62 M ops/s | 2,820.49 M ops/s | **+425.4× speedup** (-99.8% lat.) |
+| **Xen Hypervisor** | `irq.c:1302`, `time.c:1480` | `READ_ONLY` | 12.82 M traps/s | 8,161.19 M traps/s | **+636.6× speedup** (-99.8% lat.) |
+| **Linux Kernel** | `net_namespace.c:625`, `loop.c:794,1343`, `scsi_sysfs.c:484`, `intel_guc_submission.c:601` | `EMPTY_CS`, `REDUNDANT` | 14.66 M ops/s | 2,910.50 M ops/s | **+198.5× speedup** (-99.5% lat.) |
+
+*Detailed per-project reports, CSV logs, patch details, and reproduction benchmarks are available in [`experiments/cloudlab_results/`](experiments/cloudlab_results/).*
 
 ---
 
@@ -172,9 +182,10 @@ To facilitate artifact evaluation by peer reviewers, the table below maps claims
 | **Section 3 / Formal Model** | Mathematical definitions of LSG, inference rules, and safety guards | [`docs/formal_specification.md`](docs/formal_specification.md) |
 | **Section 4 / Implementation** | Core static analysis engine (CFG, Lockset, LSG, Z3 SMT) | [`src/`](src/) and [`crux.py`](crux.py) |
 | **Section 5.1 / Table 1** | Real-world static analysis results on 17 production targets | [`experiments/cloudlab_results/`](experiments/cloudlab_results/) |
-| **Section 5.2 / Figure 4** | CloudLab multi-threaded throughput & scalability curves (V0 vs V1) | [`experiments/llm_evaluation/performance_impact/images/`](experiments/llm_evaluation/performance_impact/images/) |
-| **Section 5.3 / Table 2** | Exploratory LLM study on 15 concurrency test cases | [`experiments/llm_evaluation/README.md`](experiments/llm_evaluation/README.md) |
-| **Ground Truth Validation** | Historical production commits confirming useless lock fixes | [`experiments/commit_mining/ground_truth_index.json`](experiments/commit_mining/ground_truth_index.json) |
+| **Section 5.2 / Table 2** | Historical Ground-Truth Validation (5 mined production commits) | [`experiments/commit_mining/ground_truth_index.json`](experiments/commit_mining/ground_truth_index.json) |
+| **Section 5.3 / Figures 1–4** | Performance impact of lock elision (Memcached, PostgreSQL, Xen, Linux) | [`experiments/cloudlab_results/`](experiments/cloudlab_results/) |
+| **Section 5.4 / Table 3** | Exploratory LLM study on 15 concurrency test cases (Claude, Gemini, GPT) | [`experiments/llm_evaluation/README.md`](experiments/llm_evaluation/README.md) |
+| **Section 6 / Discussion** | Empirical audit of 60 candidate sites & False Positive taxonomy | [`experiments/false_positive_study/study_report.md`](experiments/false_positive_study/study_report.md) |
 | **Sanity Check Fixtures** | Minimal `.ll` bitcode cases reproducing each anti-pattern | [`tests/integration/`](tests/integration/) |
 
 ---
@@ -222,9 +233,9 @@ CRUX/
 │   └── integration/         # End-to-end integration tests on synthetic .ll fixtures
 ├── docs/                    # Theoretical and formal documentation
 │   └── formal_specification.md # Mathematical definitions and soundness proofs
-├── paper/                   # LaTeX sources and assets for the research paper
 └── experiments/             # Experimental evaluation suites & reproducibility
-    ├── cloudlab_results/    # Reports, CSVs, and benchmarks for 17 real systems
+    ├── cloudlab_results/    # Reports, CSVs, patches, and benchmarks for 17 real systems
+    ├── false_positive_study/# Empirical audit of 60 candidate sites (8 TPs, 52 FPs)
     ├── llm_evaluation/      # Exploratory study on frontier LLMs (Claude, GPT, Gemini)
     └── commit_mining/       # Ground-truth index of mined real-world commits
 ```

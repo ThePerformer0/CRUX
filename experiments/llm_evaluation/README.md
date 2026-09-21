@@ -68,7 +68,7 @@ A primary limitation of LLMs in systems programming is their rigid adherence to 
 
 ## 4. Hardware Performance Impact (CloudLab Measurements)
 
-To measure the real-world cost when useless locks are missed by developers or AI assistants, we benchmarked the code with the useless lock (**V1**) against the lock-free optimized version (**V0**) on a dedicated multi-core CloudLab server (Intel Xeon, 32 hardware threads, Linux 5.15):
+To measure the real-world cost when useless locks are missed by developers or AI assistants, we benchmarked the code with the useless lock (**V1**) against the lock-free optimized version (**V0**) on a dedicated multi-core CloudLab server (AMD EPYC 7402P, 48 vCPUs, Ubuntu 22.04, Linux Kernel 5.15):
 
 | Benchmark Case | Difficulty Tier | Throughput Degradation | Scalability Impact |
 |---|:---:|:---:|---|
