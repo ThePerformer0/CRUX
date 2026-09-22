@@ -1,0 +1,17 @@
+========================================
+    CLOUDLAB EXPERIMENT MACHINE SPECS (CLEMSON NODE)
+========================================
+OS Kernel  : Linux 6.8.0-138-generic #138-Ubuntu SMP PREEMPT_DYNAMIC Fri Jul 31 22:41:49 UTC 2026 x86_64
+OS Release : Ubuntu 24.04.4 LTS (Noble Numbat)
+CPU Model  : Dual-Socket Intel(R) Xeon(R) CPU E5-2683 v3 @ 2.00GHz (Boost up to 3.00 GHz)
+Architecture: 2 Sockets, 14 Cores/Socket = 28 Physical Cores, 56 vCPUs (HyperThreading: 2 threads/core)
+Cache L1d  : 896 KiB (28 x 32 KiB)
+Cache L1i  : 896 KiB (28 x 32 KiB)
+Cache L2   : 7 MiB (28 x 256 KiB)
+Cache L3   : 70 MiB (2 x 35 MiB shared)
+NUMA Nodes : 2 NUMA nodes (28 vCPUs per node)
+Total RAM  : 251 GiB (Free: 250 GiB)
+Swap Space : 8.0 GiB
+Storage    : 2 x 1 TB Enterprise Disks (sda: 931.5G with 64G root, sdb: 931.5G unpartitioned)
+Sudo Access: Passwordless sudo enabled
+========================================
